@@ -34,4 +34,8 @@ public class TOKEN_V {
         this.variable_tokens = matchedVariables.toArray(new String[0]);
         return this.variable_tokens;
     }
+
+    public String getRegexString() {
+        return regex_string;
+    }
 }

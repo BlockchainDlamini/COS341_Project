@@ -34,4 +34,8 @@ public class TOKEN_N {
         this.number_tokens = matchedNumbers.toArray(new String[0]);
         return this.number_tokens;
     }
+
+    public String getRegexString() {
+        return regex_string;
+    }
 }

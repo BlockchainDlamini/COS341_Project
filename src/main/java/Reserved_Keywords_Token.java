@@ -39,4 +39,8 @@ public class Reserved_Keywords_Token {
         String [] res = v.splitKeywords("for <input the only things( i do if and only if (the main ) ((can help it then i cant help it;sqrt;".replaceAll("\\s+",""));
         System.out.println(Arrays.toString(res));
     }
+
+    public String getRegexString() {
+        return regex_string;
+    }
 }

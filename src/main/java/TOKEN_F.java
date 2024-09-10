@@ -34,4 +34,8 @@ public class TOKEN_F {
         this.function_tokens = matchedFunctions.toArray(new String[0]);
         return this.function_tokens;
     }
+
+    public String getRegexString() {
+        return regex_string;
+    }
 }

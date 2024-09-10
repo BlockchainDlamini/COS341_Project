@@ -34,4 +34,8 @@ public class TOKEN_T {
         text_tokens = matchedText.toArray(new String[0]);
         return text_tokens;
     }
+
+    public String getRegexString() {
+        return regex_string;
+    }
 }
