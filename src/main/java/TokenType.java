@@ -5,7 +5,9 @@ public enum TokenType {
     VARIABLE(new TOKEN_V().getRegexString()),
     FUNCTION(new TOKEN_F().getRegexString()),
     NUMBER(new TOKEN_N().getRegexString()),
-    TEXT(new TOKEN_T().getRegexString());
+    TEXT(new TOKEN_T().getRegexString()),
+    IGNOREDCHARS("\\s+");
+
     private final String pattern;
 
     TokenType(String pattern) {

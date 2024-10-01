@@ -21,7 +21,9 @@ public class Lexer {
                 Matcher matcher = type.getPattern().matcher(input);
                 matcher.region(position, input.length());
                 if (matcher.lookingAt()) {
-                    tokens.add(new Token(type, matcher.group()));
+                    if (type != TokenType.IGNOREDCHARS) { // Skip whitespace tokens and newlines
+                        tokens.add(new Token(type, matcher.group()));
+                    }
                     position = matcher.end();
                     matched = true;
                     break;
