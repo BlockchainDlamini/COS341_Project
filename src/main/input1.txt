@@ -1,0 +1,9 @@
+main
+num V_1, V_2, V_3
+begin
+    print V_1;
+    V_1 = 10;
+    V_2 = 20;
+    V_3 = V_1 + V_2;
+    halt
+end

@@ -1,0 +1,2 @@
+Input1.txt is meant to throw an error because it is not a valid file name.
+Input2.txt is not meant to throw an error because it is a valid file name.

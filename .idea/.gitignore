@@ -1,0 +1,64 @@
+# Default ignored files
+/shelf/
+/workspace.xml
+.idea/
+# Editor-based HTTP Client requests
+/httpRequests/
+# Datasource local storage ignored files
+/dataSources/
+/dataSources.local.xml
+
+# Ignore Maven build output
+target/
+
+# Ignore Java class files
+*.class
+
+# Ignore IDE-specific files and directories
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+
+# IntelliJ IDEA workspace
+*.swp
+*.swo
+*.sublime-workspace
+*.sublime-project
+
+# Eclipse project files
+.project
+.classpath
+.settings/
+
+# NetBeans project files
+nbproject/
+build/
+nbbuild/
+dist/
+*.nb-gradle
+*.nbm
+*.nbk
+
+# MacOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Logs
+*.log
+
+# OS-specific files
+*.bak
+*.tmp
+*.swp
+
+# Maven Wrapper
+.mvn/wrapper/
+
+# Ignore all files in the following directories
+*.log
+*.tmp
+*.bak
