@@ -4,8 +4,8 @@ import java.io.*;
 import java.util.*;
 
 public class Parser {
-    private List<Token> tokens;
-    private SyntaxTree syntaxTree;
+    private final List<Token> tokens;
+    private final SyntaxTree syntaxTree;
 
     public Parser(String xmlFilePath) throws Exception {
         this.tokens = parseXML(xmlFilePath);
