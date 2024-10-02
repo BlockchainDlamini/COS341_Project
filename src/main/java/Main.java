@@ -7,7 +7,10 @@ public class Main {
             String input = Lexer.readFile("src/main/input2.txt");
             lexer.tokenize(input);
             lexer.generateXML("output.xml");
-        } catch (IOException | LexicalError e) {
+
+            Parser parser = new Parser("output.xml");
+            parser.generateSyntaxTreeXML("syntax_tree.xml");
+        } catch (Exception e) {
             System.err.println(e.getMessage());
         }
     }
