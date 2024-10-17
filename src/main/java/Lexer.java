@@ -30,7 +30,7 @@ public class Lexer {
                 }
             }
             if (!matched) {
-                throw new LexicalError("Unexpected character at position " + position);
+                throw new LexicalError("Unexpected character at position " + position, input.substring(position, position + 1));
             }
         }
     }

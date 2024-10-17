@@ -1,0 +1,18 @@
+Recursive Descent Parser Algorithm:
+
+1. Create root node with ID 1 and symbol "main"
+2. Set root node as the root of the syntax tree
+3. Increment index to skip "main" token
+4. Initialize currentNode to root node
+5. Initialize nodeId to 2
+6. Loop through tokens starting from current index:
+   a. If token is a reserved keyword:
+      i. Create InnerNode with current nodeId, token value, and currentNode as parent
+      ii. Add InnerNode to currentNode's children and to inner nodes list
+      iii. Update currentNode to InnerNode
+      iv. Increment nodeId and index
+   b. Else (other tokens):
+      i. Create LeafNode with current nodeId, token, and currentNode as parent
+      ii. Add LeafNode to currentNode's children and to leaf nodes list
+      iii. Increment nodeId and index
+7. Return root node

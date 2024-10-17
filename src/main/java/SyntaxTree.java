@@ -8,9 +8,10 @@ public class SyntaxTree {
     private List<InnerNode> innerNodes;
     private List<LeafNode> leafNodes;
 
-    public SyntaxTree() {
+    public SyntaxTree(List<Token> tokens) {
         this.innerNodes = new ArrayList<>();
         this.leafNodes = new ArrayList<>();
+        buildSyntaxTree(tokens);
     }
 
     public void setRoot(Node root) {
@@ -23,6 +24,43 @@ public class SyntaxTree {
 
     public void addLeafNode(LeafNode node) {
         leafNodes.add(node);
+    }
+
+    private void buildSyntaxTree(List<Token> tokens) {
+        if (tokens.isEmpty()) {
+            throw new IllegalStateException("Token list is empty");
+        }
+
+        // Recursive descent algorithm to build the syntax tree
+        int[] index = {0};
+        root = parseProgram(tokens, index);
+    }
+
+    private Node parseProgram(List<Token> tokens, int[] index) {
+        Node rootNode = new Node(1, "main");
+        setRoot(rootNode);
+        index[0]++; // Skip 'main'
+
+        Node currentNode = rootNode;
+        int nodeId = 2;
+
+        while (index[0] < tokens.size()) {
+            Token token = tokens.get(index[0]);
+            if (token.getType() == TokenType.RESERVED_KEYWORD) {
+                InnerNode innerNode = new InnerNode(nodeId++, token.getValue(), currentNode);
+                currentNode.addChild(innerNode);
+                addInnerNode(innerNode);
+                currentNode = innerNode;
+                index[0]++;
+            } else {
+                LeafNode leafNode = new LeafNode(nodeId++, token, currentNode);
+                currentNode.addChild(leafNode);
+                addLeafNode(leafNode);
+                index[0]++;
+            }
+        }
+
+        return rootNode;
     }
 
     public void generateXML(String outputFilePath) throws IOException {
@@ -67,5 +105,9 @@ public class SyntaxTree {
             writer.write("  </LEAFNODES>\n");
             writer.write("</SYNTREE>\n");
         }
+    }
+
+    public Node getRoot() {
+        return root;
     }
 }

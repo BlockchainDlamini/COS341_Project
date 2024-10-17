@@ -9,8 +9,9 @@ public class Parser {
 
     public Parser(String xmlFilePath) throws Exception {
         this.tokens = parseXML(xmlFilePath);
-        this.syntaxTree = new SyntaxTree();
-        buildSyntaxTree();
+        displayTokens();
+        this.syntaxTree = new SyntaxTree(this.tokens);
+        performSemanticAnalysis();
     }
 
     private List<Token> parseXML(String xmlFilePath) throws Exception {
@@ -34,34 +35,22 @@ public class Parser {
         return tokens;
     }
 
-    private void buildSyntaxTree() {
-        // Initialize the root node
-        Node rootNode = new Node(1, "startsymbol");
-        syntaxTree.setRoot(rootNode);
-
-        // Example of adding inner nodes and leaf nodes
-        Node currentNode = rootNode;
-        int nodeId = 2;
-
-        for (Token token : tokens) {
-            if (token.getType() == TokenType.RESERVED_KEYWORD) {
-                InnerNode innerNode = new InnerNode(nodeId++, token.getValue(), currentNode);
-                currentNode.addChild(innerNode);
-                syntaxTree.addInnerNode(innerNode);
-                currentNode = innerNode;
-            } else {
-                LeafNode leafNode = new LeafNode(nodeId++, token, currentNode);
-                currentNode.addChild(leafNode);
-                syntaxTree.addLeafNode(leafNode);
-            }
-        }
+    private void performSemanticAnalysis() throws SemanticException {
+        SemanticAnalyzer analyzer = new SemanticAnalyzer(syntaxTree);
+        analyzer.analyze();
     }
 
     public SyntaxTree getSyntaxTree() {
         return syntaxTree;
     }
 
-    public void generateSyntaxTreeXML(String outputFilePath) throws IOException {
+    public void displayTokens() {
+        for (Token token : tokens) {
+            System.out.println("Type: " + token.getType() + ", Value: " + token.getValue());
+        }
+    }
+
+    public void generateSyntaxTreeXML(String outputFilePath) throws Exception {
         syntaxTree.generateXML(outputFilePath);
     }
 }

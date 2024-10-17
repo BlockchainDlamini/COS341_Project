@@ -27,4 +27,8 @@ public class Node {
     public void addChild(Node child) {
         children.add(child);
     }
+
+    public String getName() {
+        return symbol;
+    }
 }
