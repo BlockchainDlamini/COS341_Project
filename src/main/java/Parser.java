@@ -228,10 +228,35 @@ public class Parser {
 
     private Node parseTERM() {
         Node node = new Node(nodeId++, "TERM");
-        if (currentToken.getType() == TokenType.VARIABLE || currentToken.getType() == TokenType.NUMBER || currentToken.getType() == TokenType.TEXT) {
-            node.addChild(parseATOMIC());
-        } else {
-            node.addChild(parseCALL());
+        switch (currentToken.getType()) {
+            case VARIABLE:
+            case NUMBER:
+            case TEXT:
+                node.addChild(parseATOMIC());
+                break;
+            case FUNCTION:
+                node.addChild(parseCALL());
+                break;
+            case RESERVED_KEYWORD:
+                switch (currentToken.getValue()) {
+                    case "not":
+                    case "sqrt":
+                    case "or":
+                    case "and":
+                    case "eq":
+                    case "grt":
+                    case "add":
+                    case "sub":
+                    case "mul":
+                    case "div":
+                        node.addChild(parseOP());
+                        break;
+                    default:
+                        throw new RuntimeException("Unexpected token: " + currentToken);
+                }
+                return node;
+            default:
+                throw new RuntimeException("Unexpected token: " + currentToken);
         }
         return node;
     }
@@ -371,6 +396,55 @@ public class Parser {
     private Node parseSUBFUNCS() {
         Node node = new Node(nodeId++, "SUBFUNCS");
         node.addChild(parseFUNCTIONS());
+        return node;
+    }
+
+    private Node parseOP() {
+        Node node = new Node(nodeId++, "OP");
+        if (currentToken.getType() == TokenType.RESERVED_KEYWORD && (currentToken.getValue().equalsIgnoreCase("not") || currentToken.getValue().equalsIgnoreCase("sqrt"))) {
+            node.addChild(parseUNOP());
+            expect(TokenType.RESERVED_KEYWORD,"(");
+            node.addChild(parseARG());
+            expect(TokenType.RESERVED_KEYWORD,")");
+        } else if (currentToken.getType() == TokenType.RESERVED_KEYWORD && (currentToken.getValue().equalsIgnoreCase("or") || currentToken.getValue().equalsIgnoreCase("and") || currentToken.getValue().equalsIgnoreCase("eq") || currentToken.getValue().equalsIgnoreCase("grt") || currentToken.getValue().equalsIgnoreCase("add") || currentToken.getValue().equalsIgnoreCase("sub") || currentToken.getValue().equalsIgnoreCase("mul") || currentToken.getValue().equalsIgnoreCase("div"))) {
+            node.addChild(parseBINOP());
+            expect(TokenType.RESERVED_KEYWORD, "(");
+            node.addChild(parseARG());
+            expect(TokenType.RESERVED_KEYWORD,",");
+            node.addChild(parseARG());
+            expect(TokenType.RESERVED_KEYWORD,")");
+        } else {
+            throw new RuntimeException("Unexpected token: " + currentToken);
+        }
+        return node;
+    }
+
+    private Node parseUNOP() {
+        Node node = new Node(nodeId++, "UNOP");
+        switch (currentToken.getValue()) {
+            case "not":
+                node.addChild(new Node(nodeId++, "not"));
+                expect(TokenType.RESERVED_KEYWORD, "not");
+                break;
+            case "sqrt":
+                node.addChild(new Node(nodeId++, "sqrt"));
+                expect(TokenType.RESERVED_KEYWORD, "sqrt");
+                break;
+            default:
+                throw new RuntimeException("Unexpected token: " + currentToken);
+        }
+        return node;
+    }
+
+    private Node parseARG() {
+        Node node = new Node(nodeId++, "ARG");
+        if (currentToken.getType() == TokenType.VARIABLE || currentToken.getType() == TokenType.NUMBER || currentToken.getType() == TokenType.TEXT) {
+            node.addChild(parseATOMIC());
+        } else if ((currentToken.getType() == TokenType.RESERVED_KEYWORD && (currentToken.getValue().equalsIgnoreCase("or") || currentToken.getValue().equalsIgnoreCase("and")) || (currentToken.getType() == TokenType.RESERVED_KEYWORD && (currentToken.getValue().equalsIgnoreCase("eq") || currentToken.getValue().equalsIgnoreCase("grt") || currentToken.getValue().equalsIgnoreCase("add") || currentToken.getValue().equalsIgnoreCase("sub") || currentToken.getValue().equalsIgnoreCase("mul") || currentToken.getValue().equalsIgnoreCase("div"))))) {
+            node.addChild(parseOP());
+        } else {
+            throw new RuntimeException("Unexpected token: " + currentToken);
+        }
         return node;
     }
 
