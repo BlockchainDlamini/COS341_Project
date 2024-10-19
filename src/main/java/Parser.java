@@ -132,6 +132,7 @@ public class Parser {
                     case "print":
                         node.addChild(new Node(nodeId++, "print"));
                         expect(TokenType.RESERVED_KEYWORD, "print");
+                        System.out.println(currentToken.getValue());
                         node.addChild(parseATOMIC());
                         System.out.println("Hello there");
                         System.out.println(currentToken.getValue());
@@ -147,6 +148,7 @@ public class Parser {
                     default:
                         throw new RuntimeException("Unexpected token: " + currentToken);
                 }
+                return node;
             case VARIABLE:
                 node.addChild(parseASSIGN());
                 break;
