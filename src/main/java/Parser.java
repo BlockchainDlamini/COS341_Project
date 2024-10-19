@@ -96,10 +96,10 @@ public class Parser {
 
     private Node parseALGO() {
         Node node = new Node(nodeId++, "ALGO");
-        System.out.println("ALGO: " + currentToken.getValue());
         expect(TokenType.RESERVED_KEYWORD, "begin");
         node.addChild(new Node(nodeId++, "begin"));
         node.addChild(parseINSTRUC());
+        System.out.println("ALGO: " + currentToken.getValue());
         expect(TokenType.RESERVED_KEYWORD, "end");
         node.addChild(new Node(nodeId++, "end"));
         return node;
@@ -112,7 +112,9 @@ public class Parser {
         }
         System.out.println("Current token: " + currentToken.getValue());
         node.addChild(parseCOMMAND());
+        System.out.println("INSTRUC: " + currentToken.getValue());
         expect(TokenType.RESERVED_KEYWORD,";");
+        System.out.println("INSTRUC: " + currentToken.getValue());
         node.addChild(parseINSTRUC());
         return node;
     }
@@ -150,7 +152,6 @@ public class Parser {
                     case "return":
                         node.addChild(new Node(nodeId++, "return"));
                         expect(TokenType.RESERVED_KEYWORD, "return");
-                        System.out.println("RETURN 1: " + currentToken.getValue());
                         node.addChild(parseATOMIC());
                         System.out.println("RETURN: " + currentToken.getValue());
                         break;
@@ -240,9 +241,11 @@ public class Parser {
         expect(TokenType.RESERVED_KEYWORD, "then");
         node.addChild(new Node(nodeId++, "then"));
         node.addChild(parseALGO());
+        System.out.println("BRANCH ifs END: " + currentToken.getValue());
         expect(TokenType.RESERVED_KEYWORD, "else");
         node.addChild(new Node(nodeId++, "else"));
         node.addChild(parseALGO());
+        System.out.println("BRANCH ifs END: " + currentToken.getValue());
         return node;
     }
 
@@ -357,6 +360,7 @@ public class Parser {
             return node; // Nullable
         }
         node.addChild(parseDECL());
+        System.out.println("FUNCTIONS: " + currentToken.getValue());
         node.addChild(parseFUNCTIONS());
         return node;
     }
@@ -420,6 +424,7 @@ public class Parser {
         node.addChild(parseALGO());
         expect(TokenType.RESERVED_KEYWORD, "}");
         node.addChild(new Node(nodeId++, "}"));
+        System.out.println("BODY: " + currentToken.getValue());
         node.addChild(parseSUBFUNCS());
         expect(TokenType.RESERVED_KEYWORD, "end");
         node.addChild(new Node(nodeId++, "end"));
