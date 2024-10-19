@@ -28,23 +28,20 @@ public class Parser {
     }
 
     private void expect(TokenType type, String value) {
-        if (currentToken == null || currentToken.getType() != type) {
-            if (currentToken != null) {
-                throw new RuntimeException("Expected token of type " + type + ", but got " + currentToken.getType() + " with value " + currentToken.getValue());
-            } else {
-                throw new RuntimeException("Expected token of type " + type + ", but got end of tokens");
+        if (currentToken == null || (currentToken.getType() != type && !currentToken.getValue().equals(value))) {
+
+                throw new RuntimeException("Expected token of type " + type + " and value "+value+" but got " + currentToken.getType() + " with value " + currentToken.getValue());
+//            } else {
+//                throw new RuntimeException("Expected token of type " + type + ", but got end of tokens");
             }
-        }
+
         nextToken();
     }
 
     private void expect(TokenType type) {
         if (currentToken == null || currentToken.getType() != type) {
-            if (currentToken != null) {
                 throw new RuntimeException("Expected token of type " + type + ", but got " + currentToken.getType() + " with value " + currentToken.getValue());
-            } else {
-                throw new RuntimeException("Expected token of type " + type + ", but got end of tokens");
-            }
+         
         }
         nextToken();
     }
