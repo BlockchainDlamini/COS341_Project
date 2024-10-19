@@ -166,7 +166,7 @@ public class Parser {
         Node node = new Node(nodeId++, "ATOMIC");
         if (currentToken.getType() == TokenType.VARIABLE) {
             node.addChild(parseVNAME());
-        } else if (currentToken.getType() == TokenType.RESERVED_KEYWORD && currentToken.getValue().equalsIgnoreCase("const")) {
+        } else if (currentToken.getType() == TokenType.NUMBER || currentToken.getType() == TokenType.TEXT) {
             node.addChild(parseCONST());
         }
         return node;
@@ -175,7 +175,13 @@ public class Parser {
     private Node parseCONST() {
         Node node = new Node(nodeId++, "CONST");
         node.addChild(new Node(nodeId++, currentToken.getValue()));
-        expect(TokenType.RESERVED_KEYWORD, "const");
+        if (currentToken.getType() == TokenType.NUMBER) {
+            expect(TokenType.NUMBER);
+        } else if (currentToken.getType() == TokenType.TEXT) {
+            expect(TokenType.TEXT);
+        } else {
+            throw new RuntimeException("Unexpected token: " + currentToken);
+        }
         return node;
     }
 
@@ -222,7 +228,7 @@ public class Parser {
 
     private Node parseTERM() {
         Node node = new Node(nodeId++, "TERM");
-        if (currentToken.getType() == TokenType.VARIABLE || (currentToken.getType() == TokenType.RESERVED_KEYWORD && currentToken.getValue().equalsIgnoreCase("const"))) {
+        if (currentToken.getType() == TokenType.VARIABLE || currentToken.getType() == TokenType.NUMBER || currentToken.getType() == TokenType.TEXT) {
             node.addChild(parseATOMIC());
         } else {
             node.addChild(parseCALL());
