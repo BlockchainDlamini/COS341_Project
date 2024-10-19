@@ -119,6 +119,7 @@ public class Parser {
 
     private Node parseCOMMAND() {
         Node node = new Node(nodeId++, "COMMAND");
+        System.out.println("IN COMMAND: " + currentToken.getValue());
         switch (currentToken.getType()) {
             case RESERVED_KEYWORD:
                 switch (currentToken.getValue().toLowerCase()) {
@@ -149,7 +150,9 @@ public class Parser {
                     case "return":
                         node.addChild(new Node(nodeId++, "return"));
                         expect(TokenType.RESERVED_KEYWORD, "return");
+                        System.out.println("RETURN 1: " + currentToken.getValue());
                         node.addChild(parseATOMIC());
+                        System.out.println("RETURN: " + currentToken.getValue());
                         break;
                     default:
                         throw new RuntimeException("Unexpected token: " + currentToken.getValue());
@@ -174,7 +177,7 @@ public class Parser {
     private Node parseATOMIC() {
         Node node = new Node(nodeId++, "ATOMIC");
         System.out.println("ATOMIC: " + currentToken.getValue());
-        if (currentToken.getType() == TokenType.VARIABLE || currentToken.getType() == TokenType.RESERVED_KEYWORD("const")) {
+        if (currentToken.getType() == TokenType.VARIABLE) {
             node.addChild(parseVNAME());
         } else if (currentToken.getType() == TokenType.NUMBER || currentToken.getType() == TokenType.TEXT) {
             node.addChild(parseCONST());
