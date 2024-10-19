@@ -86,9 +86,11 @@ public class Parser {
     }
 
     private Node parseVNAME() {
+
         Node node = new Node(nodeId++, "VNAME");
         node.addChild(new Node(nodeId++, currentToken.getValue()));
         expect(TokenType.VARIABLE);
+
         return node;
     }
 
@@ -107,6 +109,7 @@ public class Parser {
         if (currentToken == null || (currentToken.getType() == TokenType.RESERVED_KEYWORD && currentToken.getValue().equals("end"))) {
             return node; // Nullable
         }
+        System.out.println("Current token: " + currentToken.getValue());
         node.addChild(parseCOMMAND());
         expect(TokenType.RESERVED_KEYWORD,";");
         node.addChild(parseINSTRUC());
@@ -130,6 +133,8 @@ public class Parser {
                         node.addChild(new Node(nodeId++, "print"));
                         expect(TokenType.RESERVED_KEYWORD, "print");
                         node.addChild(parseATOMIC());
+                        System.out.println("Hello there");
+                        System.out.println(currentToken.getValue());
                         break;
                     case "input":
                         node.addChild(new Node(nodeId++, "input"));
@@ -151,6 +156,7 @@ public class Parser {
             default:
                 throw new RuntimeException("Unexpected token: " + currentToken);
         }
+        System.out.println("Parsed command: " + node.getSymbol());
         return node;
     }
 
