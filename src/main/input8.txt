@@ -11,8 +11,7 @@ end
 
 num F_mainfunc(V_x, V_y, V_z)
 {
-    num V_local1, V_local2, V_localresult,
-
+    num V_local1, V_local2, V_localresult
     begin
         V_local1 = sub(V_x, V_y);
         V_local2 = mul(V_y, V_z);
@@ -21,7 +20,7 @@ num F_mainfunc(V_x, V_y, V_z)
 
     num F_localfunc(V_a, V_b, V_c)
     {
-        num V_innerresult,
+        num V_innerresult
 
         begin
             V_innerresult = add(V_a, V_b);

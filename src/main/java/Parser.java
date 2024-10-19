@@ -96,6 +96,7 @@ public class Parser {
 
     private Node parseALGO() {
         Node node = new Node(nodeId++, "ALGO");
+        System.out.println("ALGO: " + currentToken.getValue());
         expect(TokenType.RESERVED_KEYWORD, "begin");
         node.addChild(new Node(nodeId++, "begin"));
         node.addChild(parseINSTRUC());
@@ -155,9 +156,12 @@ public class Parser {
                 }
                 return node;
             case VARIABLE:
+                System.out.println("Hello there man");
                 node.addChild(parseASSIGN());
+                System.out.println("Hello there after assign of the function " + currentToken.getValue());
                 break;
             case FUNCTION:
+                System.out.println("Function: " + currentToken.getValue());
                 node.addChild(parseCALL());
                 break;
             default:
@@ -169,7 +173,8 @@ public class Parser {
 
     private Node parseATOMIC() {
         Node node = new Node(nodeId++, "ATOMIC");
-        if (currentToken.getType() == TokenType.VARIABLE) {
+        System.out.println("ATOMIC: " + currentToken.getValue());
+        if (currentToken.getType() == TokenType.VARIABLE || currentToken.getType() == TokenType.RESERVED_KEYWORD("const")) {
             node.addChild(parseVNAME());
         } else if (currentToken.getType() == TokenType.NUMBER || currentToken.getType() == TokenType.TEXT) {
             node.addChild(parseCONST());
@@ -197,16 +202,21 @@ public class Parser {
             node.addChild(new Node(nodeId++, "< input"));
             expect(TokenType.RESERVED_KEYWORD, "< input");
         } else if (currentToken.getType() == TokenType.RESERVED_KEYWORD && currentToken.getValue().equalsIgnoreCase("=")) {
+            System.out.println("CHEKCING --- THIS IS IN PARSE ASSING ");
+            System.out.println("ASSIGN: " + currentToken.getValue());
             node.addChild(new Node(nodeId++, "="));
             expect(TokenType.RESERVED_KEYWORD, "=");
             node.addChild(parseTERM());
+            System.out.println("AFTER TERM IN ASSIGN: " + currentToken.getValue());
         }
         return node;
     }
 
     private Node parseCALL() {
         Node node = new Node(nodeId++, "CALL");
+        System.out.println("CALL: " + currentToken.getValue());
         node.addChild(parseFNAME());
+        System.out.println("CALL: " + currentToken.getValue());
         expect(TokenType.RESERVED_KEYWORD, "(");
         node.addChild(parseATOMIC());
         expect(TokenType.RESERVED_KEYWORD,",");
@@ -214,6 +224,8 @@ public class Parser {
         expect(TokenType.RESERVED_KEYWORD,",");
         node.addChild(parseATOMIC());
         expect(TokenType.RESERVED_KEYWORD, ")");
+        System.out.println("Hello there man");
+
         return node;
     }
 
@@ -240,7 +252,10 @@ public class Parser {
                 node.addChild(parseATOMIC());
                 break;
             case FUNCTION:
+                System.out.println("TERM: " + currentToken.getValue());
                 node.addChild(parseCALL());
+                System.out.println("AFTER CALL IN TERM: " + currentToken.getValue());
+                System.out.println("YOLO MANS");
                 break;
             case RESERVED_KEYWORD:
                 switch (currentToken.getValue()) {
@@ -259,6 +274,7 @@ public class Parser {
                     default:
                         throw new RuntimeException("Unexpected token: " + currentToken.getValue());
                 }
+
                 return node;
             default:
                 throw new RuntimeException("Unexpected token: " + currentToken.getValue());
@@ -325,6 +341,7 @@ public class Parser {
     }
 
     private Node parseFNAME() {
+        System.out.println("FNAME: " + currentToken.getValue());
         Node node = new Node(nodeId++, "FNAME");
         node.addChild(new Node(nodeId++, currentToken.getValue()));
         expect(TokenType.FUNCTION);
@@ -342,6 +359,7 @@ public class Parser {
     }
 
     private Node parseDECL() {
+        System.out.println("DECL: " + currentToken.getValue());
         Node node = new Node(nodeId++, "DECL");
         node.addChild(parseHEADER());
         node.addChild(parseBODY());
@@ -349,6 +367,7 @@ public class Parser {
     }
 
     private Node parseHEADER() {
+        System.out.println("HEADER: " + currentToken.getValue());
         Node node = new Node(nodeId++, "HEADER");
         node.addChild(parseFTYP());
         node.addChild(parseFNAME());
@@ -362,11 +381,26 @@ public class Parser {
         return node;
     }
 
+    private Node parseLOCVARS() {
+        Node node = new Node(nodeId++, "LOCVARS");
+        System.out.println("HEY THERE IN LOCAL VARS");
+        System.out.println("Current token: " + currentToken.getValue());
+        while (currentToken != null && (currentToken.getType() == TokenType.NUMBER || currentToken.getType() == TokenType.TEXT)) {
+            node.addChild(parseVTYP());
+            node.addChild(parseVNAME());
+            expect(TokenType.RESERVED_KEYWORD, ",");
+        }
+        return node;
+    }
+
+
     private Node parseFTYP() {
         Node node = new Node(nodeId++, "FTYP");
-        if (currentToken.getType() == TokenType.NUMBER) {
+        //made a change to the check from checking Number to it checking for Reserved_Keyword num
+        //it also now expects keyword num aswell for the first if statement
+        if ((currentToken.getType() == TokenType.RESERVED_KEYWORD && currentToken.getValue().equalsIgnoreCase("num"))) {
             node.addChild(new Node(nodeId++, currentToken.getValue()));
-            expect(TokenType.NUMBER);
+            expect(TokenType.RESERVED_KEYWORD, "num");
         } else if (currentToken.getType() == TokenType.RESERVED_KEYWORD && currentToken.getValue().equalsIgnoreCase("void")) {
             node.addChild(new Node(nodeId++, "void"));
             expect(TokenType.RESERVED_KEYWORD, "void");
@@ -379,6 +413,7 @@ public class Parser {
         expect(TokenType.RESERVED_KEYWORD, "{");
         node.addChild(new Node(nodeId++, "{"));
         node.addChild(parseLOCVARS());
+        System.out.println("BODY: " + currentToken.getValue());
         node.addChild(parseALGO());
         expect(TokenType.RESERVED_KEYWORD, "}");
         node.addChild(new Node(nodeId++, "}"));
@@ -388,15 +423,6 @@ public class Parser {
         return node;
     }
 
-    private Node parseLOCVARS() {
-        Node node = new Node(nodeId++, "LOCVARS");
-        while (currentToken != null && ((currentToken.getType() == TokenType.NUMBER) || currentToken.getType() == TokenType.TEXT)) {
-            node.addChild(parseVTYP());
-            node.addChild(parseVNAME());
-            expect(TokenType.RESERVED_KEYWORD, ",");
-        }
-        return node;
-    }
 
     private Node parseSUBFUNCS() {
         Node node = new Node(nodeId++, "SUBFUNCS");
