@@ -2,9 +2,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Node {
-    private int unid;
-    private String symbol;
-    private List<Node> children;
+    public int unid;
+    public String symbol;
+    public List<Node> children;
 
     public Node(int unid, String symbol) {
         this.unid = unid;

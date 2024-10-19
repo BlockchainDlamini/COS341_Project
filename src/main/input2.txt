@@ -1,5 +1,5 @@
 main
-num V_a, V_b, V_c
+num V_a , V_b , V_c
 begin
     print V_a;
     V_a = 10;

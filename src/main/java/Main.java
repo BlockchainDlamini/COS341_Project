@@ -8,8 +8,16 @@ public class Main {
             lexer.tokenize(input);
             lexer.generateXML("output.xml");
 
+
             Parser parser = new Parser("output.xml");
-            parser.generateSyntaxTreeXML("syntax_tree.xml");
+            Node parseTree = parser.parse();
+
+            ParseTreeXMLGenerator generator = new ParseTreeXMLGenerator();
+            try {
+                generator.generateXML(parseTree, "parse_tree.xml");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         } catch (Exception e) {
             System.err.println(e.getMessage());
         }
