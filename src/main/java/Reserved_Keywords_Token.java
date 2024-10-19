@@ -8,7 +8,7 @@ public class Reserved_Keywords_Token {
         this.regex_string = String.join("|", this.keywords);
     }
     private final String regex_string;
-    private final String [] keywords = {"for", "not","sqrt", "or", "and", "eq", "grt", "add", "sub", "mul", "div", "num", "void", "begin", "end", "halt", "const","\\)","\\{", "print", "\\< input", "\\=", "if", "then", "else", "green","main", "text", "\\(","\\}", "\\,", "\\;"};
+    private final String [] keywords = {"for", "return", "not","sqrt", "or", "and", "eq", "grt", "add", "sub", "mul", "div", "num", "void", "begin", "end", "halt", "const","\\)","\\{", "print", "\\< input", "\\=", "if", "then", "else", "green","main", "text", "\\(","\\}", "\\,", "\\;"};
     private String [] reserved_keyword_tokens;
 
     public String[] getReserved_Keywords_Token() {

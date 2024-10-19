@@ -145,6 +145,11 @@ public class Parser {
                     case "if":
                         node.addChild(parseBRANCH());
                         break;
+                    case "return":
+                        node.addChild(new Node(nodeId++, "return"));
+                        expect(TokenType.RESERVED_KEYWORD, "return");
+                        node.addChild(parseATOMIC());
+                        break;
                     default:
                         throw new RuntimeException("Unexpected token: " + currentToken);
                 }
