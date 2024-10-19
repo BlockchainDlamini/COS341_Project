@@ -22,7 +22,9 @@ public class Lexer {
                 matcher.region(position, input.length());
                 if (matcher.lookingAt()) {
                     if (type != TokenType.IGNOREDCHARS) { // Skip whitespace tokens and newlines
-                        tokens.add(new Token(type, matcher.group()));
+                        Token token = new Token(type, matcher.group());
+                        tokens.add(token);
+                        System.out.println(token.getValue());
                     }
                     position = matcher.end();
                     matched = true;

@@ -1,0 +1,38 @@
+main
+num V_a, V_b, V_c, V_result1, V_result2
+begin
+    V_a = 10;
+    V_b = 5;
+    V_c = 3;
+
+    V_result1 = add(V_a, V_b);
+    V_result2 = F_mainfunc(V_result1, V_b, V_c);
+end
+
+num F_mainfunc(V_x, V_y, V_z)
+{
+    num V_local1, V_local2, V_localresult,
+
+    begin
+        V_local1 = sub(V_x, V_y);
+        V_local2 = mul(V_y, V_z);
+        V_localresult = F_localfunc(V_local1, V_local2, V_z);
+    end
+
+    num F_localfunc(V_a, V_b, V_c)
+    {
+        num V_innerresult,
+
+        begin
+            V_innerresult = add(V_a, V_b);
+            if grt(V_innerresult, V_c) then
+                print "Inner";
+            else
+                print "Equal";
+        end
+        return V_innerresult;
+    }
+
+    return V_localresult;
+}
+end

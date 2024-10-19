@@ -8,7 +8,7 @@ public class TOKEN_T {
     private String [] text_tokens;
 
     public TOKEN_T() {
-        regex_string = "\"[A-Z][a-z]{1,7}\"";
+        regex_string = "\"[A-Z][a-z]{1,8}\"";
         text_tokens = new String[0];
     }
 

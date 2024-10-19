@@ -151,7 +151,7 @@ public class Parser {
                         node.addChild(parseATOMIC());
                         break;
                     default:
-                        throw new RuntimeException("Unexpected token: " + currentToken);
+                        throw new RuntimeException("Unexpected token: " + currentToken.getValue());
                 }
                 return node;
             case VARIABLE:
@@ -161,7 +161,7 @@ public class Parser {
                 node.addChild(parseCALL());
                 break;
             default:
-                throw new RuntimeException("Unexpected token: " + currentToken);
+                throw new RuntimeException("Unexpected token: " + currentToken.getValue());
         }
         System.out.println("Parsed command: " + node.getSymbol());
         return node;
@@ -185,7 +185,7 @@ public class Parser {
         } else if (currentToken.getType() == TokenType.TEXT) {
             expect(TokenType.TEXT);
         } else {
-            throw new RuntimeException("Unexpected token: " + currentToken);
+            throw new RuntimeException("Unexpected token: " + currentToken.getValue());
         }
         return node;
     }
@@ -257,11 +257,11 @@ public class Parser {
                         node.addChild(parseOP());
                         break;
                     default:
-                        throw new RuntimeException("Unexpected token: " + currentToken);
+                        throw new RuntimeException("Unexpected token: " + currentToken.getValue());
                 }
                 return node;
             default:
-                throw new RuntimeException("Unexpected token: " + currentToken);
+                throw new RuntimeException("Unexpected token: " + currentToken.getValue());
         }
         return node;
     }
@@ -319,7 +319,7 @@ public class Parser {
                 expect(TokenType.RESERVED_KEYWORD, "div");
                 break;
             default:
-                throw new RuntimeException("Unexpected token: " + currentToken);
+                throw new RuntimeException("Unexpected token: " + currentToken.getValue());
         }
         return node;
     }
@@ -419,7 +419,7 @@ public class Parser {
             node.addChild(parseARG());
             expect(TokenType.RESERVED_KEYWORD,")");
         } else {
-            throw new RuntimeException("Unexpected token: " + currentToken);
+            throw new RuntimeException("Unexpected token: " + currentToken.getValue());
         }
         return node;
     }
@@ -436,7 +436,7 @@ public class Parser {
                 expect(TokenType.RESERVED_KEYWORD, "sqrt");
                 break;
             default:
-                throw new RuntimeException("Unexpected token: " + currentToken);
+                throw new RuntimeException("Unexpected token: " + currentToken.getValue());
         }
         return node;
     }
@@ -448,7 +448,7 @@ public class Parser {
         } else if ((currentToken.getType() == TokenType.RESERVED_KEYWORD && (currentToken.getValue().equalsIgnoreCase("or") || currentToken.getValue().equalsIgnoreCase("and")) || (currentToken.getType() == TokenType.RESERVED_KEYWORD && (currentToken.getValue().equalsIgnoreCase("eq") || currentToken.getValue().equalsIgnoreCase("grt") || currentToken.getValue().equalsIgnoreCase("add") || currentToken.getValue().equalsIgnoreCase("sub") || currentToken.getValue().equalsIgnoreCase("mul") || currentToken.getValue().equalsIgnoreCase("div"))))) {
             node.addChild(parseOP());
         } else {
-            throw new RuntimeException("Unexpected token: " + currentToken);
+            throw new RuntimeException("Unexpected token: " + currentToken.getValue());
         }
         return node;
     }
