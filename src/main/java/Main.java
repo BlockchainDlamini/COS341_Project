@@ -14,7 +14,7 @@ public class Main {
 
             ParseTreeXMLGenerator generator = new ParseTreeXMLGenerator();
             try {
-                generator.generateXML(parseTree, "parse_tree.xml");
+                generator.generateParseTreeXML(parseTree, "parse_tree.xml");
             } catch (IOException e) {
                 e.printStackTrace();
             }
