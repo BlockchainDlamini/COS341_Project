@@ -6,17 +6,16 @@ import java.util.*;
 public class Parser {
     private final List<Token> tokens;
     private final Iterator<Token> tokenIterator;
-    private final SyntaxTree syntaxTree;
     private Token currentToken;
     private int nodeId = 1;
+    private final SymbolTable symbolTable;
 
     public Parser(String xmlFilePath) throws Exception {
         this.tokens = parseXML(xmlFilePath);
         this.tokenIterator = tokens.iterator();
         this.currentToken = tokenIterator.next();
+        this.symbolTable = new SymbolTable();
         displayTokens();
-        this.syntaxTree = new SyntaxTree(this.tokens);
-        performSemanticAnalysis();
     }
 
     private void nextToken() {
@@ -56,9 +55,11 @@ public class Parser {
         Node node = new Node(nodeId++, "PROG");
         expect(TokenType.RESERVED_KEYWORD, "main");
         node.addChild(new Node(nodeId++, "main"));
+        symbolTable.enterScope();
         node.addChild(parseGLOBVARS());
         node.addChild(parseALGO());
         node.addChild(parseFUNCTIONS());
+        symbolTable.exitScope();
         return node;
     }
 
@@ -66,6 +67,10 @@ public class Parser {
         Node node = new Node(nodeId++, "GLOBVARS");
         if (currentToken != null && (currentToken.getType() == TokenType.RESERVED_KEYWORD && currentToken.getValue().equals("num") || (currentToken.getType() == TokenType.RESERVED_KEYWORD && currentToken.getValue().equals("text")))) {
             node.addChild(parseVTYP());
+            if (currentToken.getType() == TokenType.VARIABLE) {
+                String varName = currentToken.getValue();
+                symbolTable.bind(varName, new SymbolInfo("variableType", symbolTable.getScopeLevel()));
+            }
             node.addChild(parseVNAME());
             expect(TokenType.RESERVED_KEYWORD, ",");
             node.addChild(parseGLOBVARS());
@@ -193,6 +198,12 @@ public class Parser {
                     case "print":
                         node.addChild(new Node(nodeId++, "print"));
                         expect(TokenType.RESERVED_KEYWORD, "print");
+                        if (currentToken.getType() == TokenType.VARIABLE) {
+                            String varName = currentToken.getValue();
+                            if (symbolTable.lookup(varName) == null) {
+                                throw new RuntimeException("Variable " + varName + " not declared");
+                            }
+                        }
                         node.addChild(parseATOMIC());
                         break;
                     case "input":
@@ -250,6 +261,10 @@ public class Parser {
 
     private Node parseASSIGN() {
         Node node = new Node(nodeId++, "ASSIGN");
+        String varName = currentToken.getValue();
+        if (symbolTable.lookup(varName) == null) {
+            throw new RuntimeException("Variable " + varName + " not declared");
+        }
         node.addChild(parseVNAME());
         if (currentToken.getType() == TokenType.RESERVED_KEYWORD && currentToken.getValue().equalsIgnoreCase("< input")) {
             node.addChild(new Node(nodeId++, "< input"));
@@ -300,10 +315,17 @@ public class Parser {
 
     private Node parseTERM() {
         Node node = new Node(nodeId++, "TERM");
+        System.out.println("TERM: " + currentToken.getValue());
         switch (currentToken.getType()) {
             case VARIABLE:
             case NUMBER:
             case TEXT:
+                if (currentToken.getType() == TokenType.VARIABLE) {
+                    String varName = currentToken.getValue();
+                    if (symbolTable.lookup(varName) == null) {
+                        throw new RuntimeException("Variable " + varName + " not declared");
+                    }
+                }
                 node.addChild(parseATOMIC());
                 break;
             case FUNCTION:
@@ -404,6 +426,7 @@ public class Parser {
     }
 
     private Node parseFUNCTIONS() {
+        symbolTable.enterScope();
         Node node = new Node(nodeId++, "FUNCTIONS");
         if (currentToken == null || (currentToken.getType() == TokenType.RESERVED_KEYWORD && currentToken.getValue().equals("end"))) {
             return node; // Nullable
@@ -411,6 +434,7 @@ public class Parser {
         node.addChild(parseDECL());
 //        System.out.println("FUNCTIONS: " + currentToken.getValue());
         node.addChild(parseFUNCTIONS());
+        symbolTable.exitScope();
         return node;
     }
 
@@ -443,6 +467,10 @@ public class Parser {
         Node node = new Node(nodeId++, "LOCVARS");
         if (currentToken != null && (currentToken.getType() == TokenType.RESERVED_KEYWORD && currentToken.getValue().equals("num") || (currentToken.getType() == TokenType.RESERVED_KEYWORD && currentToken.getValue().equals("text")))) {
             node.addChild(parseVTYP());
+            if (currentToken.getType() == TokenType.VARIABLE) {
+                String varName = currentToken.getValue();
+                symbolTable.bind(varName, new SymbolInfo("variableType", symbolTable.getScopeLevel()));
+            }
             node.addChild(parseVNAME());
             expect(TokenType.RESERVED_KEYWORD, ",");
             node.addChild(parseLOCVARS());
@@ -493,13 +521,31 @@ public class Parser {
         if (currentToken.getType() == TokenType.RESERVED_KEYWORD && (currentToken.getValue().equalsIgnoreCase("not") || currentToken.getValue().equalsIgnoreCase("sqrt"))) {
             node.addChild(parseUNOP());
             expect(TokenType.RESERVED_KEYWORD,"(");
+            if (currentToken.getType() == TokenType.VARIABLE) {
+                String varName = currentToken.getValue();
+                if (symbolTable.lookup(varName) == null) {
+                    throw new RuntimeException("Variable " + varName + " not declared");
+                }
+            }
             node.addChild(parseARG());
             expect(TokenType.RESERVED_KEYWORD,")");
         } else if (currentToken.getType() == TokenType.RESERVED_KEYWORD && (currentToken.getValue().equalsIgnoreCase("or") || currentToken.getValue().equalsIgnoreCase("and") || currentToken.getValue().equalsIgnoreCase("eq") || currentToken.getValue().equalsIgnoreCase("grt") || currentToken.getValue().equalsIgnoreCase("add") || currentToken.getValue().equalsIgnoreCase("sub") || currentToken.getValue().equalsIgnoreCase("mul") || currentToken.getValue().equalsIgnoreCase("div"))) {
             node.addChild(parseBINOP());
             expect(TokenType.RESERVED_KEYWORD, "(");
+            if (currentToken.getType() == TokenType.VARIABLE) {
+                String varName = currentToken.getValue();
+                if (symbolTable.lookup(varName) == null) {
+                    throw new RuntimeException("Variable " + varName + " not declared");
+                }
+            }
             node.addChild(parseARG());
             expect(TokenType.RESERVED_KEYWORD,",");
+            if (currentToken.getType() == TokenType.VARIABLE) {
+                String varName = currentToken.getValue();
+                if (symbolTable.lookup(varName) == null) {
+                    throw new RuntimeException("Variable " + varName + " not declared");
+                }
+            }
             node.addChild(parseARG());
             expect(TokenType.RESERVED_KEYWORD,")");
         } else {
@@ -558,14 +604,14 @@ public class Parser {
         return tokens;
     }
 
-    private void performSemanticAnalysis() throws SemanticException {
-        SemanticAnalyzer analyzer = new SemanticAnalyzer(syntaxTree);
-        analyzer.analyze();
-    }
+//    private void performSemanticAnalysis() throws SemanticException {
+//        SemanticAnalyzer analyzer = new SemanticAnalyzer(syntaxTree);
+//        analyzer.analyze();
+//    }
 
-    public SyntaxTree getSyntaxTree() {
-        return syntaxTree;
-    }
+//    public SyntaxTree getSyntaxTree() {
+//        return syntaxTree;
+//    }
 
     public void displayTokens() {
         for (Token token : tokens) {
@@ -573,7 +619,7 @@ public class Parser {
         }
     }
 
-    public void generateSyntaxTreeXML(String outputFilePath) throws Exception {
-        syntaxTree.generateXML(outputFilePath);
-    }
+//    public void generateSyntaxTreeXML(String outputFilePath) throws Exception {
+//        syntaxTree.generateXML(outputFilePath);
+//    }
 }
