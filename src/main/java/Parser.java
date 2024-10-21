@@ -521,12 +521,12 @@ public class Parser {
         if (currentToken.getType() == TokenType.RESERVED_KEYWORD && (currentToken.getValue().equalsIgnoreCase("not") || currentToken.getValue().equalsIgnoreCase("sqrt"))) {
             node.addChild(parseUNOP());
             expect(TokenType.RESERVED_KEYWORD,"(");
-            if (currentToken.getType() == TokenType.VARIABLE) {
-                String varName = currentToken.getValue();
-                if (symbolTable.lookup(varName) == null) {
-                    throw new RuntimeException("Variable " + varName + " not declared");
-                }
-            }
+//            if (currentToken.getType() == TokenType.VARIABLE) {
+//                String varName = currentToken.getValue();
+//                if (symbolTable.lookup(varName) == null) {
+//                    throw new RuntimeException("Variable " + varName + " not declared");
+//                }
+//            }
             node.addChild(parseARG());
             expect(TokenType.RESERVED_KEYWORD,")");
         } else if (currentToken.getType() == TokenType.RESERVED_KEYWORD && (currentToken.getValue().equalsIgnoreCase("or") || currentToken.getValue().equalsIgnoreCase("and") || currentToken.getValue().equalsIgnoreCase("eq") || currentToken.getValue().equalsIgnoreCase("grt") || currentToken.getValue().equalsIgnoreCase("add") || currentToken.getValue().equalsIgnoreCase("sub") || currentToken.getValue().equalsIgnoreCase("mul") || currentToken.getValue().equalsIgnoreCase("div"))) {
