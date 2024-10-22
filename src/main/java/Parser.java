@@ -3,18 +3,22 @@ import javax.xml.parsers.*;
 import java.io.*;
 import java.util.*;
 
+// TODO: implement symbol type map for Bob
+
 public class Parser {
     private final List<Token> tokens;
     private final Iterator<Token> tokenIterator;
     private Token currentToken;
     private int nodeId = 1;
     private final SymbolTable symbolTable;
+    private final Scope scope;
 
     public Parser(String xmlFilePath) throws Exception {
         this.tokens = parseXML(xmlFilePath);
         this.tokenIterator = tokens.iterator();
         this.currentToken = tokenIterator.next();
         this.symbolTable = new SymbolTable();
+        this.scope = new Scope();
         displayTokens();
     }
 
@@ -309,6 +313,10 @@ public class Parser {
     private Node parseCALL() {
         Node node = new Node(nodeId++, "CALL");
         System.out.println("CALL: " + currentToken.getValue());
+        String funcName = currentToken.getValue();
+        if (!funcName.equals("main") && !scope.getCurrentScopeName().equals(funcName) && scope.lookup(funcName) == null) {
+            throw new RuntimeException("Function " + funcName + " not declared");
+        }
         node.addChild(parseFNAME());
         System.out.println("CALL: " + currentToken.getValue());
         expect(TokenType.RESERVED_KEYWORD, "(");
@@ -551,11 +559,16 @@ public class Parser {
 
     private Node parseDECL() {
         symbolTable.enterScope();
+        if (currentToken.getType() == TokenType.FUNCTION) {
+            String funcName = currentToken.getValue();
+            scope.enterScope(funcName);
+        }
         System.out.println("DECL: " + currentToken.getValue());
         Node node = new Node(nodeId++, "DECL");
         node.addChild(parseHEADER());
         node.addChild(parseBODY());
         symbolTable.exitScope();
+        scope.exitScope();
         return node;
     }
 
