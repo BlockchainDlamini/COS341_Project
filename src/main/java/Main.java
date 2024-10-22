@@ -8,7 +8,6 @@ public class Main {
             lexer.tokenize(input);
             lexer.generateXML("output.xml");
 
-
             Parser parser = new Parser("output.xml");
             Node parseTree = parser.parse();
 
