@@ -120,6 +120,28 @@ public class Parser {
         return node;
     }
 
+    private Node parseCOMPOSIT() {
+        Node node = new Node(nodeId++, "COMPOSIT");
+        if (currentToken.getType() == TokenType.RESERVED_KEYWORD && (currentToken.getValue().equalsIgnoreCase("not") || currentToken.getValue().equalsIgnoreCase("sqrt"))) {
+            node.addChild(parseUNOP());
+            expect(TokenType.RESERVED_KEYWORD, "(");
+            node.addChild(parseSIMPLE());
+            expect(TokenType.RESERVED_KEYWORD, ")");
+        } else if (currentToken.getType() == TokenType.RESERVED_KEYWORD && (currentToken.getValue().equalsIgnoreCase("or") || currentToken.getValue().equalsIgnoreCase("and") || currentToken.getValue().equalsIgnoreCase("eq") || currentToken.getValue().equalsIgnoreCase("grt") || currentToken.getValue().equalsIgnoreCase("add") || currentToken.getValue().equalsIgnoreCase("sub") || currentToken.getValue().equalsIgnoreCase("mul") || currentToken.getValue().equalsIgnoreCase("div"))) {
+            System.out.println("Inside of inside the COMPOSITE FUNCTION" + currentToken.getValue());
+            node.addChild(parseBINOP());
+            expect(TokenType.RESERVED_KEYWORD, "(");
+            node.addChild(parseSIMPLE());
+            expect(TokenType.RESERVED_KEYWORD, ",");
+            node.addChild(parseSIMPLE());
+            expect(TokenType.RESERVED_KEYWORD, ")");
+        } else {
+            throw new RuntimeException("Unexpected token: " + currentToken);
+        }
+        return node;
+    }
+
+
 //    private Node parseCOMMAND() {
 //        Node node = new Node(nodeId++, "COMMAND");
 //        System.out.println("IN COMMAND: " + currentToken.getValue());
@@ -337,11 +359,97 @@ public class Parser {
         return node;
     }
 
+//    private Node parseCOND() {
+//        Node node = new Node(nodeId++, "COND");
+//        node.addChild(parseSIMPLE());
+//        return node;
+//    }
+
+//    private Node parseCOND() {
+//        Node node = new Node(nodeId++, "COND");
+//        if(currentToken != null) {
+//            Iterator<Token> it =  this.tokenIterator;
+//            List<Token> cpy = new ArrayList<>();
+//            it.forEachRemaining(cpy::add);
+//            Iterator<Token> tokenIterator = cpy.iterator();
+//            boolean simple = false;
+//            int param_count = 0;
+//            while (tokenIterator.hasNext()) {
+//                System.out.println("yessss:: "+ tokenIterator.next().getValue());
+//                Token token = tokenIterator.next();
+//                if (token.getType() == TokenType.RESERVED_KEYWORD && token.getValue().equals("(")) {
+//                    System.out.println("TOKEN: " + token.getValue());
+//                    if(param_count<1) {
+//                        param_count++;
+//                        continue;
+//                    }
+//                    simple = true;
+//                    break;
+//                }else if(token.getType() == TokenType.RESERVED_KEYWORD && token.getValue().equals(","))
+//                {
+//                    System.out.println("in the commmma");
+//                    break;
+//                }
+//            }
+//            System.out.println("SIMPLE: " + simple);
+//
+//            System.out.println("COND CCCURRTENT TOKEN: " + currentToken.getValue());
+//            if ((!simple) && currentToken.getType() == TokenType.RESERVED_KEYWORD && (currentToken.getType() == TokenType.RESERVED_KEYWORD && (currentToken.getValue().equalsIgnoreCase("or") || currentToken.getValue().equalsIgnoreCase("and") || currentToken.getValue().equalsIgnoreCase("eq") || currentToken.getValue().equalsIgnoreCase("grt") || currentToken.getValue().equalsIgnoreCase("add") || currentToken.getValue().equalsIgnoreCase("sub") || currentToken.getValue().equalsIgnoreCase("mul") || currentToken.getValue().equalsIgnoreCase("div")))) {
+//                node.addChild(parseSIMPLE());
+//            } else if (simple && (currentToken.getValue().equalsIgnoreCase("not") || currentToken.getValue().equalsIgnoreCase("sqrt")) || (currentToken.getType() == TokenType.RESERVED_KEYWORD && (currentToken.getValue().equalsIgnoreCase("or") || currentToken.getValue().equalsIgnoreCase("and") || currentToken.getValue().equalsIgnoreCase("eq") || currentToken.getValue().equalsIgnoreCase("grt") || currentToken.getValue().equalsIgnoreCase("add") || currentToken.getValue().equalsIgnoreCase("sub") || currentToken.getValue().equalsIgnoreCase("mul") || currentToken.getValue().equalsIgnoreCase("div")))) {
+//                System.out.println("In the composite condition");
+//                node.addChild(parseCOMPOSIT());
+//            } else {
+//                throw new RuntimeException("Unexpected token: " + currentToken);
+//            }
+//        }
+//        return node;
+//    }
+
     private Node parseCOND() {
         Node node = new Node(nodeId++, "COND");
-        node.addChild(parseSIMPLE());
+        if (currentToken != null) {
+            if (isCOMPOSIT()) {
+                node.addChild(parseCOMPOSIT());
+            } else if (isSIMPLE()) {
+                System.out.println("helllo");
+                node.addChild(parseSIMPLE());
+            } else {
+                throw new RuntimeException("Unexpected token: " + currentToken);
+            }
+        }
         return node;
     }
+
+    private boolean isCOMPOSIT() {
+        // Lookahead logic to determine if the next tokens form a COMPOSIT
+        List<Token> tokens = new ArrayList<>(this.tokens); // Create a new list from the original tokens
+        ListIterator<Token> iterator = tokens.listIterator(tokens.indexOf(currentToken));
+        int openBrackets = 0;
+
+        while (iterator.hasNext()) {
+            Token token = iterator.next();
+            if (token.getType() == TokenType.RESERVED_KEYWORD && token.getValue().equals("(")) {
+                openBrackets++;
+            } else if (token.getType() == TokenType.RESERVED_KEYWORD && token.getValue().equals(")")) {
+                openBrackets--;
+            } else if (token.getType() == TokenType.RESERVED_KEYWORD && token.getValue().equals(",")) {
+                return openBrackets != 1; // Only one level of nesting
+            }
+            System.out.println("TOKEN: " + openBrackets);
+        }
+        return false;
+    }
+
+    private boolean isSIMPLE() {
+        // Check if the current structure matches SIMPLE's pattern
+        return currentToken != null && currentToken.getType() == TokenType.RESERVED_KEYWORD &&
+                (currentToken.getValue().equalsIgnoreCase("or") || currentToken.getValue().equalsIgnoreCase("and") ||
+                        currentToken.getValue().equalsIgnoreCase("eq") || currentToken.getValue().equalsIgnoreCase("grt") ||
+                        currentToken.getValue().equalsIgnoreCase("add") || currentToken.getValue().equalsIgnoreCase("sub") ||
+                        currentToken.getValue().equalsIgnoreCase("mul") || currentToken.getValue().equalsIgnoreCase("div"));
+    }
+
 
     private Node parseSIMPLE() {
         Node node = new Node(nodeId++, "SIMPLE");
@@ -392,6 +500,7 @@ public class Parser {
             default:
                 throw new RuntimeException("Unexpected token: " + currentToken.getValue());
         }
+        System.out.println("BINOP: " + currentToken.getValue());
         return node;
     }
 
