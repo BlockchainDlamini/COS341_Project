@@ -3,18 +3,22 @@ import javax.xml.parsers.*;
 import java.io.*;
 import java.util.*;
 
+// TODO: implement symbol type map for Bob
+
 public class Parser {
     private final List<Token> tokens;
     private final Iterator<Token> tokenIterator;
     private Token currentToken;
     private int nodeId = 1;
     private final SymbolTable symbolTable;
+    private final Scope scope;
 
     public Parser(String xmlFilePath) throws Exception {
         this.tokens = parseXML(xmlFilePath);
         this.tokenIterator = tokens.iterator();
         this.currentToken = tokenIterator.next();
         this.symbolTable = new SymbolTable();
+        this.scope = new Scope();
         displayTokens();
     }
 
@@ -261,6 +265,10 @@ public class Parser {
         Node node = new Node(nodeId++, "ATOMIC");
         System.out.println("ATOMIC: " + currentToken.getValue());
         if (currentToken.getType() == TokenType.VARIABLE) {
+            String varName = currentToken.getValue();
+            if (symbolTable.lookup(varName) == null) {
+                throw new RuntimeException("Variable " + varName + " not declared");
+            }
             node.addChild(parseVNAME());
         } else if (currentToken.getType() == TokenType.NUMBER || currentToken.getType() == TokenType.TEXT) {
             node.addChild(parseCONST());
@@ -305,6 +313,10 @@ public class Parser {
     private Node parseCALL() {
         Node node = new Node(nodeId++, "CALL");
         System.out.println("CALL: " + currentToken.getValue());
+        String funcName = currentToken.getValue();
+        if (!funcName.equals("main") && !scope.getCurrentScopeName().equals(funcName) && scope.lookup(funcName) == null) {
+            throw new RuntimeException("Function " + funcName + " not declared");
+        }
         node.addChild(parseFNAME());
         System.out.println("CALL: " + currentToken.getValue());
         expect(TokenType.RESERVED_KEYWORD, "(");
@@ -535,7 +547,6 @@ public class Parser {
     }
 
     private Node parseFUNCTIONS() {
-        symbolTable.enterScope();
         Node node = new Node(nodeId++, "FUNCTIONS");
         if (currentToken == null || (currentToken.getType() == TokenType.RESERVED_KEYWORD && currentToken.getValue().equals("end"))) {
             return node; // Nullable
@@ -543,15 +554,21 @@ public class Parser {
         node.addChild(parseDECL());
 //        System.out.println("FUNCTIONS: " + currentToken.getValue());
         node.addChild(parseFUNCTIONS());
-        symbolTable.exitScope();
         return node;
     }
 
     private Node parseDECL() {
+        symbolTable.enterScope();
+        if (currentToken.getType() == TokenType.FUNCTION) {
+            String funcName = currentToken.getValue();
+            scope.enterScope(funcName);
+        }
         System.out.println("DECL: " + currentToken.getValue());
         Node node = new Node(nodeId++, "DECL");
         node.addChild(parseHEADER());
         node.addChild(parseBODY());
+        symbolTable.exitScope();
+        scope.exitScope();
         return node;
     }
 
@@ -561,10 +578,22 @@ public class Parser {
         node.addChild(parseFTYP());
         node.addChild(parseFNAME());
         expect(TokenType.RESERVED_KEYWORD, "(");
+        if (currentToken.getType() == TokenType.VARIABLE) {
+            String varName = currentToken.getValue();
+            symbolTable.bind(varName, new SymbolInfo("variableType", symbolTable.getScopeLevel()));
+        }
         node.addChild(parseVNAME());
         expect(TokenType.RESERVED_KEYWORD, ",");
+        if (currentToken.getType() == TokenType.VARIABLE) {
+            String varName = currentToken.getValue();
+            symbolTable.bind(varName, new SymbolInfo("variableType", symbolTable.getScopeLevel()));
+        }
         node.addChild(parseVNAME());
         expect(TokenType.RESERVED_KEYWORD, ",");
+        if (currentToken.getType() == TokenType.VARIABLE) {
+            String varName = currentToken.getValue();
+            symbolTable.bind(varName, new SymbolInfo("variableType", symbolTable.getScopeLevel()));
+        }
         node.addChild(parseVNAME());
         expect(TokenType.RESERVED_KEYWORD, ")");
         return node;
@@ -630,12 +659,12 @@ public class Parser {
         if (currentToken.getType() == TokenType.RESERVED_KEYWORD && (currentToken.getValue().equalsIgnoreCase("not") || currentToken.getValue().equalsIgnoreCase("sqrt"))) {
             node.addChild(parseUNOP());
             expect(TokenType.RESERVED_KEYWORD,"(");
-//            if (currentToken.getType() == TokenType.VARIABLE) {
-//                String varName = currentToken.getValue();
-//                if (symbolTable.lookup(varName) == null) {
-//                    throw new RuntimeException("Variable " + varName + " not declared");
-//                }
-//            }
+            if (currentToken.getType() == TokenType.VARIABLE) {
+                String varName = currentToken.getValue();
+                if (symbolTable.lookup(varName) == null) {
+                    throw new RuntimeException("Variable " + varName + " not declared");
+                }
+            }
             node.addChild(parseARG());
             expect(TokenType.RESERVED_KEYWORD,")");
         } else if (currentToken.getType() == TokenType.RESERVED_KEYWORD && (currentToken.getValue().equalsIgnoreCase("or") || currentToken.getValue().equalsIgnoreCase("and") || currentToken.getValue().equalsIgnoreCase("eq") || currentToken.getValue().equalsIgnoreCase("grt") || currentToken.getValue().equalsIgnoreCase("add") || currentToken.getValue().equalsIgnoreCase("sub") || currentToken.getValue().equalsIgnoreCase("mul") || currentToken.getValue().equalsIgnoreCase("div"))) {
