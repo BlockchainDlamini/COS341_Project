@@ -804,13 +804,25 @@ public class Parser {
         while (currentToken != null) {
             if (currentToken.getType() == TokenType.RESERVED_KEYWORD && (currentToken.getValue().equals("void") || currentToken.getValue().equals("num"))) {
                 String type = currentToken.getValue();
+                SymbolInfo functionInfo;
                 nextToken();
                 if (currentToken.getType() == TokenType.FUNCTION) {
                     String funcName = currentToken.getValue();
                     if (type.equals("num")) {
-                        functionSymbolTable.bind(funcName,new SymbolInfo("functionType", ++scopeLevel,funcName, nodeId + 1, "n"));
+                        functionInfo = new SymbolInfo("functionType", ++scopeLevel,funcName, nodeId + 1, "n");
                     } else {
-                        functionSymbolTable.bind(funcName,new SymbolInfo("functionType", ++scopeLevel,funcName, nodeId + 1, "v"));
+                        functionInfo = new SymbolInfo("functionType", ++scopeLevel,funcName, nodeId + 1, "v");
+                    }
+                    functionSymbolTable.bind(funcName, functionInfo);
+
+                    while (currentToken != null && !currentToken.getValue().equals("}")) {
+                        if (currentToken.getValue().equals("return")) {
+                            nextToken();
+                            if (currentToken != null) {
+                                functionInfo.setValue(currentToken.getValue());
+                            }
+                        }
+                        nextToken();
                     }
                 }
             }

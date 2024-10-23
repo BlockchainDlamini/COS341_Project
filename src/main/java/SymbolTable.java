@@ -69,7 +69,6 @@ class SymbolTable {
         throw new RuntimeException("Variable " + id + " not declared");
     }
 
-
     public Map<Integer, SymbolInfo>  viewSymbolTable() {
         for (Map<String, SymbolInfo> scope : stack) {
             for (Map.Entry<String, SymbolInfo> entry : scope.entrySet()) {
