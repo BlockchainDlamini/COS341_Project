@@ -14,6 +14,7 @@ public class Parser {
     private final FunctionSymbolTable functionSymbolTable;
     private String funcName;
     private SymbolTable duplicateSymbolTable;
+    private String tokenString;
 
     public Parser(String xmlFilePath) throws Exception {
         this.tokens = parseXML(xmlFilePath);
@@ -22,6 +23,7 @@ public class Parser {
         this.symbolTable = new SymbolTable();
         this.functionSymbolTable = new FunctionSymbolTable();
         this.duplicateSymbolTable = new SymbolTable();
+        this.tokenString = "";
         displayTokens();
     }
 
@@ -84,8 +86,13 @@ public class Parser {
             node.addChild(parseVTYP());
             if (currentToken.getType() == TokenType.VARIABLE) {
                 String varName = currentToken.getValue();
-                symbolTable.bind(varName, new SymbolInfo("variableType", symbolTable.getScopeLevel()));
-                duplicateSymbolTable.bind(Integer.toString(nodeId + 1), new SymbolInfo("variableType", duplicateSymbolTable.getScopeLevel(), varName, nodeId + 1));
+                symbolTable.bind(varName, new SymbolInfo("variableType", symbolTable.getScopeLevel(), nodeId + 1));
+                Node prev = node.getLastChild().getLastChild();
+                if (prev.getSymbol().equals("num")) {
+                    duplicateSymbolTable.bind(Integer.toString(nodeId + 1), new SymbolInfo("variableType", duplicateSymbolTable.getScopeLevel(), varName, nodeId + 1,"n"));
+                } else {
+                    duplicateSymbolTable.bind(Integer.toString(nodeId + 1), new SymbolInfo("variableType", duplicateSymbolTable.getScopeLevel(), varName, nodeId + 1,"t"));
+                }
             }
             node.addChild(parseVNAME());
             expect(TokenType.RESERVED_KEYWORD, ",");
@@ -308,6 +315,7 @@ public class Parser {
             throw new RuntimeException("Variable " + varName + " not declared");
         }
         node.addChild(parseVNAME());
+        StringBuilder valueBuilder = new StringBuilder();
         if (currentToken.getType() == TokenType.RESERVED_KEYWORD && currentToken.getValue().equalsIgnoreCase("< input")) {
             node.addChild(new Node(nodeId++, "< input"));
             expect(TokenType.RESERVED_KEYWORD, "< input");
@@ -316,12 +324,34 @@ public class Parser {
             System.out.println("ASSIGN: " + currentToken.getValue());
             node.addChild(new Node(nodeId++, "="));
             expect(TokenType.RESERVED_KEYWORD, "=");
+
+            // Create a deep copy of the tokenIterator
+            List<Token> tokenList = new ArrayList<>(tokens);
+            ListIterator<Token> tokenCopyIterator = tokenList.listIterator(tokens.indexOf(currentToken));
+            Token currentTokenCopy = tokenCopyIterator.next();
+
+            // Collect token values until ';' is encountered
+            while (currentTokenCopy != null && (currentTokenCopy.getType() != TokenType.RESERVED_KEYWORD || !currentTokenCopy.getValue().equals(";"))) {
+                valueBuilder.append(currentTokenCopy.getValue()).append("");
+                if (tokenCopyIterator.hasNext()) {
+                    currentTokenCopy = tokenCopyIterator.next();
+                } else {
+                    currentTokenCopy = null;
+                }
+            }
+
+            for (int currentScopeLevel = duplicateSymbolTable.getScopeLevel(); currentScopeLevel >= 0; currentScopeLevel--) {
+                if (duplicateSymbolTable.idLookup(currentScopeLevel, varName) != null) {
+                    duplicateSymbolTable.setSymbolValue(duplicateSymbolTable.idLookup(currentScopeLevel, varName), valueBuilder.toString().trim());
+                    break;
+                }
+            }
+
             node.addChild(parseTERM());
             System.out.println("AFTER TERM IN ASSIGN: " + currentToken.getValue());
         }
         return node;
     }
-
     private Node parseCALL() {
         Node node = new Node(nodeId++, "CALL");
         if (currentToken.getType() == TokenType.FUNCTION) {
@@ -592,22 +622,22 @@ public class Parser {
         expect(TokenType.RESERVED_KEYWORD, "(");
         if (currentToken.getType() == TokenType.VARIABLE) {
             String varName = currentToken.getValue();
-            symbolTable.bind(varName, new SymbolInfo("variableType", symbolTable.getScopeLevel()));
-            duplicateSymbolTable.bind(Integer.toString(nodeId + 1), new SymbolInfo("variableType", duplicateSymbolTable.getScopeLevel(), varName, nodeId + 1));
+            symbolTable.bind(varName, new SymbolInfo("variableType", symbolTable.getScopeLevel(), nodeId + 1));
+            duplicateSymbolTable.bind(Integer.toString(nodeId + 1), new SymbolInfo("variableType", duplicateSymbolTable.getScopeLevel(), varName, nodeId + 1, "n"));
         }
         node.addChild(parseVNAME());
         expect(TokenType.RESERVED_KEYWORD, ",");
         if (currentToken.getType() == TokenType.VARIABLE) {
             String varName = currentToken.getValue();
-            symbolTable.bind(varName, new SymbolInfo("variableType", symbolTable.getScopeLevel()));
-            duplicateSymbolTable.bind(Integer.toString(nodeId + 1), new SymbolInfo("variableType", duplicateSymbolTable.getScopeLevel(), varName, nodeId + 1));
+            symbolTable.bind(varName, new SymbolInfo("variableType", symbolTable.getScopeLevel(), nodeId + 1));
+            duplicateSymbolTable.bind(Integer.toString(nodeId + 1), new SymbolInfo("variableType", duplicateSymbolTable.getScopeLevel(), varName, nodeId + 1, "n"));
         }
         node.addChild(parseVNAME());
         expect(TokenType.RESERVED_KEYWORD, ",");
         if (currentToken.getType() == TokenType.VARIABLE) {
             String varName = currentToken.getValue();
-            symbolTable.bind(varName, new SymbolInfo("variableType", symbolTable.getScopeLevel()));
-            duplicateSymbolTable.bind(Integer.toString(nodeId + 1), new SymbolInfo("variableType", duplicateSymbolTable.getScopeLevel(), varName, nodeId + 1));
+            symbolTable.bind(varName, new SymbolInfo("variableType", symbolTable.getScopeLevel(), nodeId + 1));
+            duplicateSymbolTable.bind(Integer.toString(nodeId + 1), new SymbolInfo("variableType", duplicateSymbolTable.getScopeLevel(), varName, nodeId + 1, "n"));
         }
         node.addChild(parseVNAME());
         expect(TokenType.RESERVED_KEYWORD, ")");
@@ -622,8 +652,15 @@ public class Parser {
             node.addChild(parseVTYP());
             if (currentToken.getType() == TokenType.VARIABLE) {
                 String varName = currentToken.getValue();
-                symbolTable.bind(varName, new SymbolInfo("variableType", symbolTable.getScopeLevel()));
-                duplicateSymbolTable.bind(Integer.toString(nodeId + 1), new SymbolInfo("variableType", duplicateSymbolTable.getScopeLevel(), varName, nodeId + 1));
+                symbolTable.bind(varName, new SymbolInfo("variableType", symbolTable.getScopeLevel(), nodeId + 1));
+                Node prev = node.getLastChild().getLastChild();
+                if (prev.getSymbol().equals("num")) {
+                    System.out.println("Previous: " + prev.getSymbol());
+                    duplicateSymbolTable.bind(Integer.toString(nodeId + 1), new SymbolInfo("variableType", duplicateSymbolTable.getScopeLevel(), varName, nodeId + 1,"n"));
+                } else {
+                    System.out.println("Previous: " + prev.getSymbol());
+                    duplicateSymbolTable.bind(Integer.toString(nodeId + 1), new SymbolInfo("variableType", duplicateSymbolTable.getScopeLevel(), varName, nodeId + 1,"t"));
+                }
             }
             node.addChild(parseVNAME());
             expect(TokenType.RESERVED_KEYWORD, ",");
@@ -764,7 +801,7 @@ public class Parser {
                 nextToken();
                 if (currentToken.getType() == TokenType.FUNCTION) {
                     String funcName = currentToken.getValue();
-                    functionSymbolTable.bind(funcName,new SymbolInfo("functionType", 0));
+                    functionSymbolTable.bind(funcName,new SymbolInfo("functionType", 0, nodeId + 1));
                 }
             }
             nextToken();

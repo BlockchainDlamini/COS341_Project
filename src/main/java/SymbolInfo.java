@@ -1,21 +1,33 @@
+import java.util.ArrayList;
+
 public class SymbolInfo {
     private String type;
     private int scopeLevel;
-    private String value;
+    private int parentScopeLevel;
+    private ArrayList<String> value;
     private String name;
     private int id;
     private String dataType;
 
-    public SymbolInfo(String type, int scopeLevel) {
+    public SymbolInfo(String type, int scopeLevel, int id) {
         this.type = type;
         this.scopeLevel = scopeLevel;
+        this.id = id;
+        this.value = new ArrayList<String>();
     }
 
-    public SymbolInfo( String type, int scopeLevel, String name, int id) {
+    public void setValue(String value) {
+        this.value.add(value);
+    }
+
+    public SymbolInfo( String type, int scopeLevel, String name, int id, String dataType) {
         this.type = type;
         this.scopeLevel = scopeLevel;
         this.name = name;
-        this.id = id; }
+        this.id = id;
+        this.dataType = dataType;
+        this.value = new ArrayList<String>();
+    }
 
     public String getType() {
         return type;
@@ -25,11 +37,15 @@ public class SymbolInfo {
         return "SymbolInfo{" +
                 "type='" + type + '\'' +
                 ", scopeLevel=" + scopeLevel +
-                ", value='" + value + '\'' +
+                ", value='" + value.toString() + '\'' +
                 ", name='" + name + '\'' +
                 ", id=" + id +
                 ", dataType=" + dataType +
                 '}';
+    }
+
+    public int getId() {
+        return id;
     }
 
     public int getScopeLevel() {
@@ -40,13 +56,6 @@ public class SymbolInfo {
         return name;
     }
 
-    public void updateValue(String value) {
-        this.value = value;
-    }
-
-    public String getValue() {
-        return value;
-    }
 
     public void updateDataType(String dataType) {
         this.dataType = dataType;
