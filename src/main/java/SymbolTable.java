@@ -74,22 +74,14 @@ class SymbolTable {
     public Map<String, SymbolInfo>  viewSymbolTable() {
         for (Map<String, SymbolInfo> scope : stack) {
             for (Map.Entry<String, SymbolInfo> entry : scope.entrySet()) {
-                System.out.println("Var: " + entry.getValue().getName() + ", Info: " + entry.getValue().toString());
+//                System.out.println("Var: " + entry.getValue().getName() + ", Info: " + entry.getValue().toString());
                 map.put(entry.getValue().getName(), entry.getValue());
             }
         }
         return map;
     }
 
-    public void  viewSymbolTable(Map<String, SymbolInfo> mp) {
-        System.out.println("--------------------------------------------------------------------------------------------------------");
-        System.out.println("--------------------------------------------------------------------------------------------------------");
-        System.out.println("--------------------------------------------------------------------------------------------------------");
-        System.out.println();
-        for (Map.Entry<String, SymbolInfo> scope : mp.entrySet() ) {
-                System.out.println("Var: " + scope.getValue().getName() + ", Info: " + scope.getValue().toString());
-        }
-    }
+
 
     public int getScopeLevel() {
         return stack.size() - 1;

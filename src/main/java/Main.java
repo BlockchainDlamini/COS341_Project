@@ -15,12 +15,17 @@ public class Main {
             lexer.tokenize(input);
             lexer.generateXML("output.xml");
 
+            Map<String, SymbolInfo> symbolTableMap = null;
             Parser parser = new Parser("output.xml");
             Node parseTree = parser.parse();
-            parser.getFunctionSymbolTable().display();
             SymbolTable duplicateSymbolTable = new SymbolTable(parser.getSymbolTable());
-            Map<String, SymbolInfo> symbolTableMap = duplicateSymbolTable.viewSymbolTable();
-            duplicateSymbolTable.viewSymbolTable(symbolTableMap);
+            symbolTableMap = duplicateSymbolTable.viewSymbolTable();
+            symbolTableMap.putAll(parser.getFunctionSymbolTable().display());
+            viewMapSymbolInfo(symbolTableMap);
+            System.out.println();
+            System.out.println();
+            System.out.println();
+            System.out.println();
             ParseTreeXMLGenerator generator = new ParseTreeXMLGenerator();
             try {
                 generator.generateParseTreeXML(parseTree, "parse_tree.xml");
@@ -32,6 +37,18 @@ public class Main {
             typeChecker.typecheck(parseTree);
         } catch (Exception e) {
             System.err.println(e.getMessage());
+        }
+    }
+
+    public static void  viewMapSymbolInfo(Map<String, SymbolInfo> mp) {
+        for (Map.Entry<String, SymbolInfo> scope : mp.entrySet() ) {
+            if(scope.getValue().getName().charAt(0) == 'F') {
+                System.out.println("Function: " + scope.getValue().getName() + ", Info: " + scope.getValue().toString());
+            }
+            else
+            {
+                System.out.println("Var: " + scope.getValue().getName() + ", Info: " + scope.getValue().toString());
+            }
         }
     }
 }

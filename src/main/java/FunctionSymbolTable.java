@@ -3,8 +3,11 @@ import java.util.*;
 class FunctionSymbolTable {
     private Map<String, Map<String, SymbolInfo>> table;
     private String currentScopeName;
+    private Map<String, SymbolInfo> map;
+
 
     public FunctionSymbolTable() {
+        map = new HashMap<String, SymbolInfo>();
         table = new HashMap<>();
         enterScope("main"); // Initialize with the global scope
     }
@@ -53,12 +56,19 @@ class FunctionSymbolTable {
         return currentScopeName;
     }
 
-    public void display() {
+    public Map<String, SymbolInfo> display() {
         for (Map.Entry<String, Map<String, SymbolInfo>> entry : table.entrySet()) {
-            System.out.println("Scope: " + entry.getKey());
+//            System.out.println("Scope: " + entry.getKey());
             for (Map.Entry<String, SymbolInfo> innerEntry : entry.getValue().entrySet()) {
-                System.out.println(innerEntry.getKey() + " -> " + innerEntry.getValue());
+//                System.out.println(innerEntry.getKey() + " -> " + innerEntry.getValue());
+                map.put(innerEntry.getValue().getName(), innerEntry.getValue());
             }
+        }
+        return map;
+    }
+    public void viewFunctionSymbolTable(Map<String, SymbolInfo> symbolTableMap) {
+        for (Map.Entry<String, SymbolInfo> entry : symbolTableMap.entrySet()) {
+            System.out.println(entry.getKey() + " -> " + entry.getValue());
         }
     }
 }
