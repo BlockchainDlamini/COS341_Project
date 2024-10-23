@@ -809,17 +809,32 @@ public class Parser {
                 if (currentToken.getType() == TokenType.FUNCTION) {
                     String funcName = currentToken.getValue();
                     if (type.equals("num")) {
-                        functionInfo = new SymbolInfo("functionType", ++scopeLevel,funcName, nodeId + 1, "n");
+                        functionInfo = new SymbolInfo("functionType", ++scopeLevel,funcName, 0, "n");
                     } else {
-                        functionInfo = new SymbolInfo("functionType", ++scopeLevel,funcName, nodeId + 1, "v");
+                        functionInfo = new SymbolInfo("functionType", ++scopeLevel,funcName, 0, "v");
                     }
                     functionSymbolTable.bind(funcName, functionInfo);
 
                     while (currentToken != null && !currentToken.getValue().equals("}")) {
                         if (currentToken.getValue().equals("return")) {
                             nextToken();
-                            if (currentToken != null) {
-                                functionInfo.setValue(currentToken.getValue());
+                            if (functionInfo.getDataType().equals("n")) {
+                                if (currentToken != null) {
+                                    if ( currentToken.getType() == TokenType.VARIABLE || currentToken.getType() == TokenType.NUMBER) {
+                                        functionInfo.setValue(currentToken.getValue());
+                                    } else {
+                                        // TODO: @BOB I know this is meant to be done in type so feel free to comment it out but I wanted to make sure that our functions had valid return statements since the parser wasn't picking that, you can comment out the expection
+                                        throw new RuntimeException("Expected a number, but got " + currentToken.getValue() + " for function " + funcName);
+                                    }
+                                } else {
+                                    throw new RuntimeException("Expected a number, but got null token for function " + funcName);
+                                }
+                            } else if (functionInfo.getDataType().equals("v")) {
+                                if (currentToken != null) {
+                                    if (!(currentToken.getType() == TokenType.RESERVED_KEYWORD && currentToken.getValue().equals(";"))) {
+                                        throw new RuntimeException("Invalid return type for function return type void " + funcName );
+                                    }
+                                }
                             }
                         }
                         nextToken();

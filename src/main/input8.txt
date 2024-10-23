@@ -47,7 +47,6 @@ num F_secondlocalfunc(V_a, V_b, V_c)
         if grt(V_innerresult, V_c) then
             begin
                 print "Inner";
-                return V_a;
             end
         else
             begin

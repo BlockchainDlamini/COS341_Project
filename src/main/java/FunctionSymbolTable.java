@@ -56,6 +56,16 @@ class FunctionSymbolTable {
         return currentScopeName;
     }
 
+    public void setId(String currentScopeName, int id) {
+        for (Map<String, SymbolInfo> scope : table.values()) {
+            for (Map.Entry<String, SymbolInfo> entry: scope.entrySet()) {
+                if (entry.getValue().getName().equals(currentScopeName)) {
+                    entry.getValue().setId(id);
+                }
+            }
+        }
+    }
+
     public Map<String, SymbolInfo> display() {
         for (Map.Entry<String, Map<String, SymbolInfo>> entry : table.entrySet()) {
 //            System.out.println("Scope: " + entry.getKey());
