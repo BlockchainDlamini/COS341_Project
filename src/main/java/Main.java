@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.util.Map;
 import java.util.Scanner;
 
 public class Main {
@@ -17,9 +18,12 @@ public class Main {
             Parser parser = new Parser("output.xml");
             Node parseTree = parser.parse();
             SymbolTable duplicateSymbolTable = new SymbolTable(parser.getSymbolTable());
-            duplicateSymbolTable.viewSymbolTable();
-
+            Map<Integer, SymbolInfo> symbolTableMap = duplicateSymbolTable.viewSymbolTable();
             ParseTreeXMLGenerator generator = new ParseTreeXMLGenerator();
+            TypeChecker typeChecker = new TypeChecker(symbolTableMap);
+            typeChecker.typecheck(parseTree);
+
+
             try {
                 generator.generateParseTreeXML(parseTree, "parse_tree.xml");
             } catch (IOException e) {

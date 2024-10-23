@@ -8,7 +8,7 @@ public class TypeChecker {
         symbolTable = symbl;
     }
     // Symbol table to store variable and function types
-    private Map<Integer, SymbolInfo> symbolTable ; // Make sure symbolTable is initialized
+    private final Map<Integer, SymbolInfo> symbolTable ; // Make sure symbolTable is initialized
 
     public boolean typecheck(Node node) {
         switch (node.symbol) {

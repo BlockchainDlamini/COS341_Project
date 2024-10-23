@@ -2,8 +2,10 @@ import java.util.*;
 
 class SymbolTable {
     private Stack<Map<String, SymbolInfo>> stack;
+    private Map<Integer, SymbolInfo> map;
 
     public SymbolTable() {
+        map = new HashMap<Integer, SymbolInfo>();
         stack = new Stack<>();
         enterScope(); // Initialize with the global scope
     }
@@ -45,12 +47,14 @@ class SymbolTable {
         throw new RuntimeException("Variable " + name + " not declared");
     }
 
-    public void viewSymbolTable() {
+    public Map<Integer, SymbolInfo>  viewSymbolTable() {
         for (Map<String, SymbolInfo> scope : stack) {
             for (Map.Entry<String, SymbolInfo> entry : scope.entrySet()) {
                 System.out.println("Var id: " + entry.getKey() + ", Info: " + entry.getValue().toString());
+                map.put(Integer.valueOf(entry.getKey()), entry.getValue());
             }
         }
+        return map;
     }
 
     public int getScopeLevel() {
