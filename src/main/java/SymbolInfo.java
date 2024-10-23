@@ -1,6 +1,4 @@
-import java.util.ArrayList;
-
-class SymbolInfo {
+public class SymbolInfo {
     private String type;
     private int scopeLevel;
     private int parentScopeLevel;
@@ -54,5 +52,21 @@ class SymbolInfo {
 
     public int getScopeLevel() {
         return scopeLevel;
+    }
+
+    public void updateValue(String value) {
+        this.value = value;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public void updateDataType(String dataType) {
+        this.dataType = dataType;
+    }
+
+    public String getDataType() {
+        return dataType;
     }
 }
