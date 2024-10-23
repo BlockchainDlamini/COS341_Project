@@ -809,9 +809,9 @@ public class Parser {
                 if (currentToken.getType() == TokenType.FUNCTION) {
                     String funcName = currentToken.getValue();
                     if (type.equals("num")) {
-                        functionInfo = new SymbolInfo("functionType", ++scopeLevel,funcName, nodeId + 1, "n");
+                        functionInfo = new SymbolInfo("functionType", ++scopeLevel,funcName, 0, "n");
                     } else {
-                        functionInfo = new SymbolInfo("functionType", ++scopeLevel,funcName, nodeId + 1, "v");
+                        functionInfo = new SymbolInfo("functionType", ++scopeLevel,funcName, 0, "v");
                     }
                     functionSymbolTable.bind(funcName, functionInfo);
 

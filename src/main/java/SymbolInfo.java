@@ -44,6 +44,10 @@ public class SymbolInfo {
                 '}';
     }
 
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public int getId() {
         return id;
     }
