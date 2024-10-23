@@ -7,19 +7,26 @@ import java.util.*;
 
 public class Parser {
     private final List<Token> tokens;
-    private final Iterator<Token> tokenIterator;
+    private Iterator<Token> tokenIterator;
     private Token currentToken;
     private int nodeId = 1;
     private final SymbolTable symbolTable;
-    private final Scope scope;
+    private final FunctionSymbolTable functionSymbolTable;
+    private String funcName;
+    private SymbolTable duplicateSymbolTable;
 
     public Parser(String xmlFilePath) throws Exception {
         this.tokens = parseXML(xmlFilePath);
         this.tokenIterator = tokens.iterator();
         this.currentToken = tokenIterator.next();
         this.symbolTable = new SymbolTable();
-        this.scope = new Scope();
+        this.functionSymbolTable = new FunctionSymbolTable();
+        this.duplicateSymbolTable = new SymbolTable();
         displayTokens();
+    }
+
+    public SymbolTable getSymbolTable() {
+        return duplicateSymbolTable;
     }
 
     private void nextToken() {
@@ -52,6 +59,9 @@ public class Parser {
     }
 
     public Node parse() {
+        // First pass: Collect function declarations
+        collectFunctionDeclarations();
+        // Second pass: Parse the program
         return parsePROG();
     }
 
@@ -60,6 +70,7 @@ public class Parser {
         expect(TokenType.RESERVED_KEYWORD, "main");
         node.addChild(new Node(nodeId++, "main"));
         symbolTable.enterScope();
+        duplicateSymbolTable.enterScope();
         node.addChild(parseGLOBVARS());
         node.addChild(parseALGO());
         node.addChild(parseFUNCTIONS());
@@ -74,6 +85,7 @@ public class Parser {
             if (currentToken.getType() == TokenType.VARIABLE) {
                 String varName = currentToken.getValue();
                 symbolTable.bind(varName, new SymbolInfo("variableType", symbolTable.getScopeLevel()));
+                duplicateSymbolTable.bind(Integer.toString(nodeId + 1), new SymbolInfo("variableType", duplicateSymbolTable.getScopeLevel(), varName, nodeId + 1));
             }
             node.addChild(parseVNAME());
             expect(TokenType.RESERVED_KEYWORD, ",");
@@ -312,13 +324,13 @@ public class Parser {
 
     private Node parseCALL() {
         Node node = new Node(nodeId++, "CALL");
-        System.out.println("CALL: " + currentToken.getValue());
-        String funcName = currentToken.getValue();
-        if (!funcName.equals("main") && !scope.getCurrentScopeName().equals(funcName) && scope.lookup(funcName) == null) {
-            throw new RuntimeException("Function " + funcName + " not declared");
+        if (currentToken.getType() == TokenType.FUNCTION) {
+            String funcName = currentToken.getValue();
+            if (!funcName.equals("main") && !functionSymbolTable.getCurrentScopeName().equals(funcName) && functionSymbolTable.lookup(funcName) == null) {
+                throw new RuntimeException("Function " + funcName + " not declared");
+            }
         }
         node.addChild(parseFNAME());
-        System.out.println("CALL: " + currentToken.getValue());
         expect(TokenType.RESERVED_KEYWORD, "(");
         node.addChild(parseATOMIC());
         expect(TokenType.RESERVED_KEYWORD,",");
@@ -326,7 +338,6 @@ public class Parser {
         expect(TokenType.RESERVED_KEYWORD,",");
         node.addChild(parseATOMIC());
         expect(TokenType.RESERVED_KEYWORD, ")");
-        System.out.println("Hello there man");
 
         return node;
     }
@@ -559,16 +570,13 @@ public class Parser {
 
     private Node parseDECL() {
         symbolTable.enterScope();
-        if (currentToken.getType() == TokenType.FUNCTION) {
-            String funcName = currentToken.getValue();
-            scope.enterScope(funcName);
-        }
+        duplicateSymbolTable.enterScope();
         System.out.println("DECL: " + currentToken.getValue());
         Node node = new Node(nodeId++, "DECL");
         node.addChild(parseHEADER());
         node.addChild(parseBODY());
         symbolTable.exitScope();
-        scope.exitScope();
+        funcName = functionSymbolTable.exitScope(funcName);
         return node;
     }
 
@@ -576,23 +584,30 @@ public class Parser {
         System.out.println("HEADER: " + currentToken.getValue());
         Node node = new Node(nodeId++, "HEADER");
         node.addChild(parseFTYP());
+        if (currentToken.getType() == TokenType.FUNCTION) {
+            funcName = currentToken.getValue();
+            functionSymbolTable.enterScope(funcName);
+        }
         node.addChild(parseFNAME());
         expect(TokenType.RESERVED_KEYWORD, "(");
         if (currentToken.getType() == TokenType.VARIABLE) {
             String varName = currentToken.getValue();
             symbolTable.bind(varName, new SymbolInfo("variableType", symbolTable.getScopeLevel()));
+            duplicateSymbolTable.bind(Integer.toString(nodeId + 1), new SymbolInfo("variableType", duplicateSymbolTable.getScopeLevel(), varName, nodeId + 1));
         }
         node.addChild(parseVNAME());
         expect(TokenType.RESERVED_KEYWORD, ",");
         if (currentToken.getType() == TokenType.VARIABLE) {
             String varName = currentToken.getValue();
             symbolTable.bind(varName, new SymbolInfo("variableType", symbolTable.getScopeLevel()));
+            duplicateSymbolTable.bind(Integer.toString(nodeId + 1), new SymbolInfo("variableType", duplicateSymbolTable.getScopeLevel(), varName, nodeId + 1));
         }
         node.addChild(parseVNAME());
         expect(TokenType.RESERVED_KEYWORD, ",");
         if (currentToken.getType() == TokenType.VARIABLE) {
             String varName = currentToken.getValue();
             symbolTable.bind(varName, new SymbolInfo("variableType", symbolTable.getScopeLevel()));
+            duplicateSymbolTable.bind(Integer.toString(nodeId + 1), new SymbolInfo("variableType", duplicateSymbolTable.getScopeLevel(), varName, nodeId + 1));
         }
         node.addChild(parseVNAME());
         expect(TokenType.RESERVED_KEYWORD, ")");
@@ -608,6 +623,7 @@ public class Parser {
             if (currentToken.getType() == TokenType.VARIABLE) {
                 String varName = currentToken.getValue();
                 symbolTable.bind(varName, new SymbolInfo("variableType", symbolTable.getScopeLevel()));
+                duplicateSymbolTable.bind(Integer.toString(nodeId + 1), new SymbolInfo("variableType", duplicateSymbolTable.getScopeLevel(), varName, nodeId + 1));
             }
             node.addChild(parseVNAME());
             expect(TokenType.RESERVED_KEYWORD, ",");
@@ -740,6 +756,22 @@ public class Parser {
             }
         }
         return tokens;
+    }
+
+    private void collectFunctionDeclarations() {
+        while (currentToken != null) {
+            if (currentToken.getType() == TokenType.RESERVED_KEYWORD && (currentToken.getValue().equals("void") || currentToken.getValue().equals("num"))) {
+                nextToken();
+                if (currentToken.getType() == TokenType.FUNCTION) {
+                    String funcName = currentToken.getValue();
+                    functionSymbolTable.bind(funcName,new SymbolInfo("functionType", 0));
+                }
+            }
+            nextToken();
+        }
+        // Reset token iterator for the second pass
+        this.tokenIterator = tokens.iterator();
+        this.currentToken = tokenIterator.next();
     }
 
 //    private void performSemanticAnalysis() throws SemanticException {
