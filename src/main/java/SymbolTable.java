@@ -45,6 +45,28 @@ class SymbolTable {
         throw new RuntimeException("Variable " + name + " not declared");
     }
 
+    public String idLookup(int scopeLevel, String varName) {
+        for (Map<String, SymbolInfo> scope : stack) {
+            for (Map.Entry<String, SymbolInfo> entry: scope.entrySet()) {
+                if (entry.getValue().getScopeLevel() == scopeLevel && entry.getValue().getName().equals(varName)) {
+                    return entry.getKey();
+                }
+            }
+        }
+        return null;
+    }
+
+    public void setSymbolValue(String id, String value) {
+        for (int i = stack.size() - 1; i >= 0; i--) {
+            Map<String, SymbolInfo> scope = stack.get(i);
+            if (scope.containsKey(id)) {
+                scope.get(id).setValue(value);
+                return;
+            }
+        }
+        throw new RuntimeException("Variable " + id + " not declared");
+    }
+
     public void viewSymbolTable() {
         for (Map<String, SymbolInfo> scope : stack) {
             for (Map.Entry<String, SymbolInfo> entry : scope.entrySet()) {

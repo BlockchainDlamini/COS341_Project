@@ -13,6 +13,7 @@ num F_mainfunc(V_x, V_y, V_z)
 {
     num V_local1, num V_local2, num V_localresult,
     begin
+        print V_a;
         V_local1 = sub(V_x, V_y);
         V_local2 = mul(V_y, V_z);
         V_localresult = F_localfunc(V_local1, V_local2, V_z);

@@ -24,6 +24,10 @@ public class Node {
         return children;
     }
 
+    public Node getLastChild() {
+        return children.get(children.size() - 1);
+    }
+
     public void addChild(Node child) {
         children.add(child);
     }
