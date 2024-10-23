@@ -1,4 +1,4 @@
-class SymbolInfo {
+public class SymbolInfo {
     private String type;
     private int scopeLevel;
     private String value;
