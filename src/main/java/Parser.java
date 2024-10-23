@@ -31,6 +31,10 @@ public class Parser {
         return duplicateSymbolTable;
     }
 
+    public FunctionSymbolTable getFunctionSymbolTable() {
+        return functionSymbolTable;
+    }
+
     private void nextToken() {
         if (tokenIterator.hasNext()) {
             currentToken = tokenIterator.next();
@@ -796,12 +800,18 @@ public class Parser {
     }
 
     private void collectFunctionDeclarations() {
+        int scopeLevel = 1;
         while (currentToken != null) {
             if (currentToken.getType() == TokenType.RESERVED_KEYWORD && (currentToken.getValue().equals("void") || currentToken.getValue().equals("num"))) {
+                String type = currentToken.getValue();
                 nextToken();
                 if (currentToken.getType() == TokenType.FUNCTION) {
                     String funcName = currentToken.getValue();
-                    functionSymbolTable.bind(funcName,new SymbolInfo("functionType", 0, nodeId + 1));
+                    if (type.equals("num")) {
+                        functionSymbolTable.bind(funcName,new SymbolInfo("functionType", ++scopeLevel,funcName, nodeId + 1, "n"));
+                    } else {
+                        functionSymbolTable.bind(funcName,new SymbolInfo("functionType", ++scopeLevel,funcName, nodeId + 1, "v"));
+                    }
                 }
             }
             nextToken();

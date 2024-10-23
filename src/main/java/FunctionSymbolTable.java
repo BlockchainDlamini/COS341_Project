@@ -52,4 +52,13 @@ class FunctionSymbolTable {
     public String getCurrentScopeName() {
         return currentScopeName;
     }
+
+    public void display() {
+        for (Map.Entry<String, Map<String, SymbolInfo>> entry : table.entrySet()) {
+            System.out.println("Scope: " + entry.getKey());
+            for (Map.Entry<String, SymbolInfo> innerEntry : entry.getValue().entrySet()) {
+                System.out.println(innerEntry.getKey() + " -> " + innerEntry.getValue());
+            }
+        }
+    }
 }

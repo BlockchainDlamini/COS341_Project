@@ -17,6 +17,7 @@ public class Main {
 
             Parser parser = new Parser("output.xml");
             Node parseTree = parser.parse();
+            parser.getFunctionSymbolTable().display();
             SymbolTable duplicateSymbolTable = new SymbolTable(parser.getSymbolTable());
             Map<Integer, SymbolInfo> symbolTableMap = duplicateSymbolTable.viewSymbolTable();
             ParseTreeXMLGenerator generator = new ParseTreeXMLGenerator();
