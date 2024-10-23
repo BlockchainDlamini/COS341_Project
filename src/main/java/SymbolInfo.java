@@ -33,10 +33,6 @@ public class SymbolInfo {
         return type;
     }
 
-    public String getName() {
-        return name;
-    }
-
     public String toString() {
         return "SymbolInfo{" +
                 "type='" + type + '\'' +
@@ -56,13 +52,10 @@ public class SymbolInfo {
         return scopeLevel;
     }
 
-//    public void updateValue(String value) {
-//        this.value = value;
-//    }
-//
-//    public String getValue() {
-//        return value;
-//    }
+    public String getName() {
+        return name;
+    }
+
 
     public void updateDataType(String dataType) {
         this.dataType = dataType;

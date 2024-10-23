@@ -2,7 +2,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Node {
-    public int unid;
+    private int unid;
     public String symbol;
     public List<Node> children;
     private Node parent;
