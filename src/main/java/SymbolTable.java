@@ -69,12 +69,12 @@ class SymbolTable {
         throw new RuntimeException("Variable " + id + " not declared");
     }
 
-    public void viewSymbolTable() {
+
     public Map<Integer, SymbolInfo>  viewSymbolTable() {
         for (Map<String, SymbolInfo> scope : stack) {
             for (Map.Entry<String, SymbolInfo> entry : scope.entrySet()) {
                 System.out.println("Var id: " + entry.getKey() + ", Info: " + entry.getValue().toString());
-                map.put(Integer.valueOf(entry.getKey()), entry.getValue());
+//                map.put(Integer.valueOf(entry.getKey()), entry.getValue());
             }
         }
         return map;

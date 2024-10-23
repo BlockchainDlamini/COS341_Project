@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 public class SymbolInfo {
     private String type;
     private int scopeLevel;
@@ -5,7 +7,7 @@ public class SymbolInfo {
     private ArrayList<String> value;
     private String name;
     private int id;
-    private char dataType;
+    private String dataType;
 
     public SymbolInfo(String type, int scopeLevel, int id) {
         this.type = type;
@@ -18,7 +20,7 @@ public class SymbolInfo {
         this.value.add(value);
     }
 
-    public SymbolInfo( String type, int scopeLevel, String name, int id, char dataType) {
+    public SymbolInfo( String type, int scopeLevel, String name, int id, String dataType) {
         this.type = type;
         this.scopeLevel = scopeLevel;
         this.name = name;
@@ -54,13 +56,13 @@ public class SymbolInfo {
         return scopeLevel;
     }
 
-    public void updateValue(String value) {
-        this.value = value;
-    }
-
-    public String getValue() {
-        return value;
-    }
+//    public void updateValue(String value) {
+//        this.value = value;
+//    }
+//
+//    public String getValue() {
+//        return value;
+//    }
 
     public void updateDataType(String dataType) {
         this.dataType = dataType;

@@ -89,9 +89,9 @@ public class Parser {
                 symbolTable.bind(varName, new SymbolInfo("variableType", symbolTable.getScopeLevel(), nodeId + 1));
                 Node prev = node.getLastChild().getLastChild();
                 if (prev.getSymbol().equals("num")) {
-                    duplicateSymbolTable.bind(Integer.toString(nodeId + 1), new SymbolInfo("variableType", duplicateSymbolTable.getScopeLevel(), varName, nodeId + 1,'n'));
+                    duplicateSymbolTable.bind(Integer.toString(nodeId + 1), new SymbolInfo("variableType", duplicateSymbolTable.getScopeLevel(), varName, nodeId + 1,"n"));
                 } else {
-                    duplicateSymbolTable.bind(Integer.toString(nodeId + 1), new SymbolInfo("variableType", duplicateSymbolTable.getScopeLevel(), varName, nodeId + 1,'t'));
+                    duplicateSymbolTable.bind(Integer.toString(nodeId + 1), new SymbolInfo("variableType", duplicateSymbolTable.getScopeLevel(), varName, nodeId + 1,"t"));
                 }
             }
             node.addChild(parseVNAME());
@@ -623,21 +623,21 @@ public class Parser {
         if (currentToken.getType() == TokenType.VARIABLE) {
             String varName = currentToken.getValue();
             symbolTable.bind(varName, new SymbolInfo("variableType", symbolTable.getScopeLevel(), nodeId + 1));
-            duplicateSymbolTable.bind(Integer.toString(nodeId + 1), new SymbolInfo("variableType", duplicateSymbolTable.getScopeLevel(), varName, nodeId + 1, 'n'));
+            duplicateSymbolTable.bind(Integer.toString(nodeId + 1), new SymbolInfo("variableType", duplicateSymbolTable.getScopeLevel(), varName, nodeId + 1, "n"));
         }
         node.addChild(parseVNAME());
         expect(TokenType.RESERVED_KEYWORD, ",");
         if (currentToken.getType() == TokenType.VARIABLE) {
             String varName = currentToken.getValue();
             symbolTable.bind(varName, new SymbolInfo("variableType", symbolTable.getScopeLevel(), nodeId + 1));
-            duplicateSymbolTable.bind(Integer.toString(nodeId + 1), new SymbolInfo("variableType", duplicateSymbolTable.getScopeLevel(), varName, nodeId + 1, 'n'));
+            duplicateSymbolTable.bind(Integer.toString(nodeId + 1), new SymbolInfo("variableType", duplicateSymbolTable.getScopeLevel(), varName, nodeId + 1, "n"));
         }
         node.addChild(parseVNAME());
         expect(TokenType.RESERVED_KEYWORD, ",");
         if (currentToken.getType() == TokenType.VARIABLE) {
             String varName = currentToken.getValue();
             symbolTable.bind(varName, new SymbolInfo("variableType", symbolTable.getScopeLevel(), nodeId + 1));
-            duplicateSymbolTable.bind(Integer.toString(nodeId + 1), new SymbolInfo("variableType", duplicateSymbolTable.getScopeLevel(), varName, nodeId + 1, 'n'));
+            duplicateSymbolTable.bind(Integer.toString(nodeId + 1), new SymbolInfo("variableType", duplicateSymbolTable.getScopeLevel(), varName, nodeId + 1, "n"));
         }
         node.addChild(parseVNAME());
         expect(TokenType.RESERVED_KEYWORD, ")");
@@ -656,10 +656,10 @@ public class Parser {
                 Node prev = node.getLastChild().getLastChild();
                 if (prev.getSymbol().equals("num")) {
                     System.out.println("Previous: " + prev.getSymbol());
-                    duplicateSymbolTable.bind(Integer.toString(nodeId + 1), new SymbolInfo("variableType", duplicateSymbolTable.getScopeLevel(), varName, nodeId + 1,'n'));
+                    duplicateSymbolTable.bind(Integer.toString(nodeId + 1), new SymbolInfo("variableType", duplicateSymbolTable.getScopeLevel(), varName, nodeId + 1,"n"));
                 } else {
                     System.out.println("Previous: " + prev.getSymbol());
-                    duplicateSymbolTable.bind(Integer.toString(nodeId + 1), new SymbolInfo("variableType", duplicateSymbolTable.getScopeLevel(), varName, nodeId + 1,'t'));
+                    duplicateSymbolTable.bind(Integer.toString(nodeId + 1), new SymbolInfo("variableType", duplicateSymbolTable.getScopeLevel(), varName, nodeId + 1,"t"));
                 }
             }
             node.addChild(parseVNAME());
