@@ -78,8 +78,8 @@ public class TypeChecker {
             Node vt = node.children.get(0);
             Node vn = node.children.get(1);
             String vtType = typeof(vt);
-            String id = vn.symbol;
-            symbolTable.put(id, vtType.charAt(0));
+            int id = vn.unid;
+            symbolTable.get(id).updateDataType(vtType);
             return typecheck(node.children.get(2));
         }
     }
@@ -240,8 +240,8 @@ public class TypeChecker {
         Node vname3 = node.children.get(4);
 
         String ftypType = typeof(ftyp);
-        String fnameId = fname.symbol;
-        symbolTable.put(fnameId, ftypType.charAt(0));
+        int fnameId = fname.unid;
+        symbolTable.get(fnameId).updateDataType(ftypType);
         boolean vnameCheck = "n".equals(typeof(vname1)) && "n".equals(typeof(vname2)) && "n".equals(typeof(vname3));
 
         return typecheck(ftyp) && vnameCheck;
@@ -269,18 +269,16 @@ public class TypeChecker {
         Node vn3 = node.children.get(5);
 
         String vt1Type = typeof(vt1);
-        String id1 = vn1.symbol;
-        symbolTable.put(id1, vt1Type.charAt(0));
-
+        int id1 = vn1.unid;
+        symbolTable.get(id1).updateDataType(vt1Type);
         String vt2Type = typeof(vt2);
-        String id2 = vn2.symbol;
-        symbolTable.put(id2, vt2Type.charAt(0));
-
+        int id2 = vn2.unid;
+        symbolTable.get(id2).updateDataType(vt2Type);
         String vt3Type = typeof(vt3);
-        String id3 = vn3.symbol;
-        symbolTable.put(id3, vt3Type.charAt(0));
+        int id3 = vn3.unid;
+        symbolTable.get(id3).updateDataType(vt3Type);
 
-        return "n".equals(vt1Type) && "n".equals(vt2Type) && "n".equals(vt3Type);
+        return true;
     }
 
     private boolean typecheckSUBFUNCS(Node node) {
@@ -300,7 +298,7 @@ public class TypeChecker {
                 return typeof(node.children.get(0));
             case "CALL":
                 if (typecheckCALL(node)) {
-                    return symbolTable.get(node.children.get(0).symbol) == 'n' ? "n" : "u";
+                    return symbolTable.get(node.children.getFirst().getUnid()).getDataType().equals("n") ? "n" : "u";
                 } else {
                     return "u"; // Undefined
                 }
@@ -323,7 +321,7 @@ public class TypeChecker {
                 }
             case "FNAME":
             case "VNAME":
-                return Character.toString(symbolTable.get(node.children.get(0).symbol));
+                return symbolTable.get(node.children.get(0).getUnid()).getDataType();
             case "SIMPLE":
             case "COMPOSIT":
                 return "b";

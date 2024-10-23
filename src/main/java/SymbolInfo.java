@@ -4,7 +4,7 @@ class SymbolInfo {
     private String value;
     private String name;
     private int id;
-    private char dataType;
+    private String dataType;
 
     public SymbolInfo(String type, int scopeLevel) {
         this.type = type;
@@ -17,5 +17,21 @@ class SymbolInfo {
 
     public int getScopeLevel() {
         return scopeLevel;
+    }
+
+    public void updateValue(String value) {
+        this.value = value;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public void updateDataType(String dataType) {
+        this.dataType = dataType;
+    }
+
+    public String getDataType() {
+        return dataType;
     }
 }
