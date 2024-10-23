@@ -10,6 +10,8 @@ public class Main {
 
             Parser parser = new Parser("output.xml");
             Node parseTree = parser.parse();
+            SymbolTable duplicateSymbolTable = new SymbolTable(parser.getSymbolTable());
+            duplicateSymbolTable.viewSymbolTable();
 
             ParseTreeXMLGenerator generator = new ParseTreeXMLGenerator();
             try {

@@ -8,6 +8,13 @@ class SymbolTable {
         enterScope(); // Initialize with the global scope
     }
 
+    public SymbolTable(SymbolTable symbolTable) {
+        stack = new Stack<>();
+        for (Map<String, SymbolInfo> scope : symbolTable.stack) {
+            stack.push(new HashMap<>(scope));
+        }
+    }
+
     public void enterScope() {
         stack.push(new HashMap<>());
     }
@@ -36,6 +43,14 @@ class SymbolTable {
             }
         }
         throw new RuntimeException("Variable " + name + " not declared");
+    }
+
+    public void viewSymbolTable() {
+        for (Map<String, SymbolInfo> scope : stack) {
+            for (Map.Entry<String, SymbolInfo> entry : scope.entrySet()) {
+                System.out.println("Var id: " + entry.getKey() + ", Info: " + entry.getValue().toString());
+            }
+        }
     }
 
     public int getScopeLevel() {

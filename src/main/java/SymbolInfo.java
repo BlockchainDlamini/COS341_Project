@@ -11,8 +11,25 @@ class SymbolInfo {
         this.scopeLevel = scopeLevel;
     }
 
+    public SymbolInfo( String type, int scopeLevel, String name, int id) {
+        this.type = type;
+        this.scopeLevel = scopeLevel;
+        this.name = name;
+        this.id = id; }
+
     public String getType() {
         return type;
+    }
+
+    public String toString() {
+        return "SymbolInfo{" +
+                "type='" + type + '\'' +
+                ", scopeLevel=" + scopeLevel +
+                ", value='" + value + '\'' +
+                ", name='" + name + '\'' +
+                ", id=" + id +
+                ", dataType=" + dataType +
+                '}';
     }
 
     public int getScopeLevel() {
