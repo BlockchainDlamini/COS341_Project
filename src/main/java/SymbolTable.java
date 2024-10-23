@@ -2,15 +2,16 @@ import java.util.*;
 
 class SymbolTable {
     private Stack<Map<String, SymbolInfo>> stack;
-    private Map<Integer, SymbolInfo> map;
+    private Map<String, SymbolInfo> map;
 
     public SymbolTable() {
-        map = new HashMap<Integer, SymbolInfo>();
+        map = new HashMap<String, SymbolInfo>();
         stack = new Stack<>();
         enterScope(); // Initialize with the global scope
     }
 
     public SymbolTable(SymbolTable symbolTable) {
+        map = new HashMap<String, SymbolInfo>();
         stack = new Stack<>();
         for (Map<String, SymbolInfo> scope : symbolTable.stack) {
             stack.push(new HashMap<>(scope));
@@ -47,14 +48,24 @@ class SymbolTable {
         throw new RuntimeException("Variable " + name + " not declared");
     }
 
-    public Map<Integer, SymbolInfo>  viewSymbolTable() {
+    public Map<String, SymbolInfo>  viewSymbolTable() {
         for (Map<String, SymbolInfo> scope : stack) {
             for (Map.Entry<String, SymbolInfo> entry : scope.entrySet()) {
-                System.out.println("Var id: " + entry.getKey() + ", Info: " + entry.getValue().toString());
-                map.put(Integer.valueOf(entry.getKey()), entry.getValue());
+                System.out.println("Var: " + entry.getValue().getName() + ", Info: " + entry.getValue().toString());
+                map.put(entry.getValue().getName(), entry.getValue());
             }
         }
         return map;
+    }
+
+    public void  viewSymbolTable(Map<String, SymbolInfo> mp) {
+        System.out.println("--------------------------------------------------------------------------------------------------------");
+        System.out.println("--------------------------------------------------------------------------------------------------------");
+        System.out.println("--------------------------------------------------------------------------------------------------------");
+        System.out.println();
+        for (Map.Entry<String, SymbolInfo> scope : mp.entrySet() ) {
+                System.out.println("Var: " + scope.getValue().getName() + ", Info: " + scope.getValue().toString());
+        }
     }
 
     public int getScopeLevel() {

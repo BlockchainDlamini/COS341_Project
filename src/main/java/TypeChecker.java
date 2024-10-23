@@ -3,12 +3,12 @@ import java.util.Map;
 
 public class TypeChecker {
 
-    public TypeChecker(Map<Integer, SymbolInfo> symbl)
+    public TypeChecker(Map<String, SymbolInfo> symbl)
     {
         symbolTable = symbl;
     }
     // Symbol table to store variable and function types
-    private final Map<Integer, SymbolInfo> symbolTable ; // Make sure symbolTable is initialized
+    private final Map<String, SymbolInfo> symbolTable ; // Make sure symbolTable is initialized
 
     public boolean typecheck(Node node) {
         switch (node.symbol) {
@@ -78,8 +78,11 @@ public class TypeChecker {
             Node vt = node.children.get(0);
             Node vn = node.children.get(1);
             String vtType = typeof(vt);
-            int id = vn.unid;
-            symbolTable.get(id).updateDataType(vtType);
+            String syb = vn.getChildren().getFirst().getSymbol();
+            System.out.println(vt.getSymbol() + " --- " +vn.getSymbol());
+            symbolTable.get(syb).updateDataType(vtType);
+            System.out.println(syb);
+            System.out.println(symbolTable.get(syb).getDataType());
             return typecheck(node.children.get(2));
         }
     }
@@ -92,7 +95,9 @@ public class TypeChecker {
         if (node.children.isEmpty()) {
             return true;
         } else {
-            return typecheck(node.children.get(0)) && typecheck(node.children.get(2));
+            boolean v = typecheck(node.children.get(0)) && typecheck(node.children.get(1));
+            System.out.println(v);
+            return v;
         }
     }
 
@@ -127,9 +132,11 @@ public class TypeChecker {
     }
 
     private boolean typecheckASSIGN(Node node) {
+        System.out.println("In typecheckASSIGN");
         Node vname = node.children.get(0);
-        Node term = node.children.get(1);
-        return typecheck(vname) && typecheck(term) && typeof(vname).equals(typeof(term));
+        Node term = node.children.get(2);
+        System.out.println(vname.getSymbol() + " --- " +term.getSymbol());
+        return typecheck(term) && typeof(vname).equals(typeof(term));
     }
 
     private boolean typecheckTERM(Node node) {
@@ -206,7 +213,8 @@ public class TypeChecker {
         return false;
     }
 
-    private boolean typecheckCOMPOSIT(Node node) {
+
+        private boolean typecheckCOMPOSIT(Node node) {
         Node firstChild = node.children.get(0);
         if (firstChild.symbol.equals("BINOP")) {
             Node simple1 = node.children.get(1);
@@ -240,7 +248,7 @@ public class TypeChecker {
         Node vname3 = node.children.get(4);
 
         String ftypType = typeof(ftyp);
-        int fnameId = fname.unid;
+        int fnameId = fname.getUnid();
         symbolTable.get(fnameId).updateDataType(ftypType);
         boolean vnameCheck = "n".equals(typeof(vname1)) && "n".equals(typeof(vname2)) && "n".equals(typeof(vname3));
 
@@ -269,13 +277,13 @@ public class TypeChecker {
         Node vn3 = node.children.get(5);
 
         String vt1Type = typeof(vt1);
-        int id1 = vn1.unid;
+        int id1 = vn1.getUnid();
         symbolTable.get(id1).updateDataType(vt1Type);
         String vt2Type = typeof(vt2);
-        int id2 = vn2.unid;
+        int id2 = vn2.getUnid();
         symbolTable.get(id2).updateDataType(vt2Type);
         String vt3Type = typeof(vt3);
-        int id3 = vn3.unid;
+        int id3 = vn3.getUnid();
         symbolTable.get(id3).updateDataType(vt3Type);
 
         return true;
@@ -321,7 +329,9 @@ public class TypeChecker {
                 }
             case "FNAME":
             case "VNAME":
-                return symbolTable.get(node.children.get(0).getUnid()).getDataType();
+                System.out.println(symbolTable.get(node.children.getFirst().getSymbol()).getDataType());
+
+                return symbolTable.get(node.children.getFirst().getSymbol()).getDataType();
             case "SIMPLE":
             case "COMPOSIT":
                 return "b";

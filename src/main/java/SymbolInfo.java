@@ -36,6 +36,10 @@ public class SymbolInfo {
         return scopeLevel;
     }
 
+    public String getName() {
+        return name;
+    }
+
     public void updateValue(String value) {
         this.value = value;
     }
