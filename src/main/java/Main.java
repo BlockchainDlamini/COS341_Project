@@ -1,3 +1,4 @@
+import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Scanner;
@@ -5,15 +6,31 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         try {
-//            Scanner scanner = new Scanner(System.in);
-//            System.out.println("Enter the filename to be executed: ");
-//            String filename = scanner.nextLine();
-//            String input = Lexer.readFile("src/main/" + filename + ".txt");
+            Scanner scanner = new Scanner(System.in);
+            System.out.println("Enter the filename to be executed: ");
+            String filename = scanner.nextLine();
+
+            String jarDir = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParent();
+
+            // Construct the file path relative to the JAR directory
+            File file = new File(jarDir, filename);
+
+            // Check if the file exists
+            if (!file.exists()) {
+                System.out.println("File not found: " + file.getAbsolutePath());
+                return;
+            }
+
+            // Read the file using the Lexer class (or any other logic)
+            String input = Lexer.readFile(file.getAbsolutePath());
+
+             Lexer.readFile(file.getAbsolutePath());
 //            Uncomment the above code and comment the below code to take input from the user
-            String input = Lexer.readFile("src/main/input8.txt");
+//            String input = Lexer.readFile("src/main/input8.txt");
             Lexer lexer = new Lexer();
             lexer.tokenize(input);
             lexer.generateXML("output.xml");
+
 
             Map<String, SymbolInfo> symbolTableMap = null;
             Parser parser = new Parser("output.xml");
@@ -34,7 +51,8 @@ public class Main {
             }
 
             TypeChecker typeChecker = new TypeChecker(symbolTableMap);
-            typeChecker.typecheck(parseTree);
+            if(!typeChecker.typecheck(parseTree))
+                throw new Exception("Type checking error");
         } catch (Exception e) {
             System.err.println(e.getMessage());
         }
