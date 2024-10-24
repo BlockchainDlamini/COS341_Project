@@ -207,12 +207,7 @@ public class Translator {
                     code.add("IF " + translatedOp + "(" + operand + ") THEN GOTO " + labelTrue + " ELSE GOTO " + labelFalse);
                     code.add("LABEL " + labelFalse);
                 }
-            } else {
-                throw new IllegalArgumentException("Invalid number of arguments in condition: " + condition);
             }
-        } else {
-            // If the condition is not in function-style, handle it as a simple condition
-            throw new IllegalArgumentException("Unsupported condition format: " + condition);
         }
     }
 
@@ -285,9 +280,7 @@ public class Translator {
                     return op; // Default to the operator itself if not found
             }
         }
-
-        // If we reach here, it means the operator is not valid or the number of arguments was wrong
-        throw new IllegalArgumentException("Invalid operator format or number of arguments: " + op);
+        return "";
     }
 
     public void writeTranslatedCodeToFile(String filename) {
