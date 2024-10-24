@@ -46,10 +46,11 @@ public class Lexer {
             writer.write("<TOKENSTREAM>\n");
             int id = 1;
             for (Token token : tokens) {
+                String escapedTokenValue = token.getValue().replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
                 writer.write("  <TOK>\n");
                 writer.write("    <ID>" + id++ + "</ID>\n");
                 writer.write("    <CLASS>" + token.getType() + "</CLASS>\n");
-                writer.write("    <WORD>" + token.getValue() + "</WORD>\n");
+                writer.write("    <WORD>" + escapedTokenValue + "</WORD>\n");
                 writer.write("  </TOK>\n");
             }
             writer.write("</TOKENSTREAM>\n");
