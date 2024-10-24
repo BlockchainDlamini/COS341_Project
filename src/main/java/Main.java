@@ -8,14 +8,15 @@ public class Main {
         try {
             Scanner scanner = new Scanner(System.in);
             System.out.println("Enter the filename to be executed: ");
+
             String filename = scanner.nextLine();
 
             String jarDir = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParent();
-
-            // Construct the file path relative to the JAR directory
+//
+//            // Construct the file path relative to the JAR directory
             File file = new File(jarDir, filename);
-
-            // Check if the file exists
+//
+//            // Check if the file exists
             if (!file.exists()) {
                 System.out.println("File not found: " + file.getAbsolutePath());
                 return;
@@ -38,11 +39,11 @@ public class Main {
             SymbolTable duplicateSymbolTable = new SymbolTable(parser.getSymbolTable());
             symbolTableMap = duplicateSymbolTable.viewSymbolTable();
             symbolTableMap.putAll(parser.getFunctionSymbolTable().display());
-            viewMapSymbolInfo(symbolTableMap);
-            System.out.println();
-            System.out.println();
-            System.out.println();
-            System.out.println();
+//            viewMapSymbolInfo(symbolTableMap);
+//            System.out.println();
+//            System.out.println();
+//            System.out.println();
+//            System.out.println();
             ParseTreeXMLGenerator generator = new ParseTreeXMLGenerator();
             try {
                 generator.generateParseTreeXML(parseTree, "parse_tree.xml");

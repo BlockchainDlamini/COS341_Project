@@ -44,7 +44,7 @@ public class Parser {
     }
 
     private void expect(TokenType type, String value) {
-        System.out.println("Expected token of type " + type + " and value "+value+" but got " + currentToken.getType() + " with value " + currentToken.getValue());
+        //System.out.println("Expected token of type " + type + " and value "+value+" but got " + currentToken.getType() + " with value " + currentToken.getValue());
         if (currentToken == null || (currentToken.getType() != type && !currentToken.getValue().equals(value))) {
 
                 throw new RuntimeException("Expected token of type " + type + " and value "+value+" but got " + currentToken.getType() + " with value " + currentToken.getValue());
@@ -56,7 +56,7 @@ public class Parser {
     }
 
     private void expect(TokenType type) {
-        System.out.println("Expected token of type " + type + ", and got " + currentToken.getType() + " with value " + currentToken.getValue());
+        //System.out.println("Expected token of type " + type + ", and got " + currentToken.getType() + " with value " + currentToken.getValue());
         if (currentToken == null || currentToken.getType() != type) {
                 throw new RuntimeException("Expected token of type " + type + ", but got " + currentToken.getType() + " with value " + currentToken.getValue());
          
@@ -132,7 +132,7 @@ public class Parser {
         expect(TokenType.RESERVED_KEYWORD, "begin");
         node.addChild(new Node(nodeId++, "begin"));
         node.addChild(parseINSTRUC());
-        System.out.println("ALGO: " + currentToken.getValue());
+        //System.out.println("ALGO: " + currentToken.getValue());
         expect(TokenType.RESERVED_KEYWORD, "end");
         node.addChild(new Node(nodeId++, "end"));
         return node;
@@ -143,11 +143,11 @@ public class Parser {
         if (currentToken == null || (currentToken.getType() == TokenType.RESERVED_KEYWORD && currentToken.getValue().equals("end"))) {
             return node; // Nullable
         }
-        System.out.println("Current token: " + currentToken.getValue());
+        //System.out.println("Current token: " + currentToken.getValue());
         node.addChild(parseCOMMAND());
-        System.out.println("INSTRUC: " + currentToken.getValue());
+        //System.out.println("INSTRUC: " + currentToken.getValue());
         expect(TokenType.RESERVED_KEYWORD,";");
-        System.out.println("INSTRUC: " + currentToken.getValue());
+        //System.out.println("INSTRUC: " + currentToken.getValue());
         node.addChild(parseINSTRUC());
         return node;
     }
@@ -160,7 +160,7 @@ public class Parser {
             node.addChild(parseSIMPLE());
             expect(TokenType.RESERVED_KEYWORD, ")");
         } else if (currentToken.getType() == TokenType.RESERVED_KEYWORD && (currentToken.getValue().equalsIgnoreCase("or") || currentToken.getValue().equalsIgnoreCase("and") || currentToken.getValue().equalsIgnoreCase("eq") || currentToken.getValue().equalsIgnoreCase("grt") || currentToken.getValue().equalsIgnoreCase("add") || currentToken.getValue().equalsIgnoreCase("sub") || currentToken.getValue().equalsIgnoreCase("mul") || currentToken.getValue().equalsIgnoreCase("div"))) {
-            System.out.println("Inside of inside the COMPOSITE FUNCTION" + currentToken.getValue());
+            //System.out.println("Inside of inside the COMPOSITE FUNCTION" + currentToken.getValue());
             node.addChild(parseBINOP());
             expect(TokenType.RESERVED_KEYWORD, "(");
             node.addChild(parseSIMPLE());
@@ -176,7 +176,7 @@ public class Parser {
 
 //    private Node parseCOMMAND() {
 //        Node node = new Node(nodeId++, "COMMAND");
-//        System.out.println("IN COMMAND: " + currentToken.getValue());
+//        //System.out.println("IN COMMAND: " + currentToken.getValue());
 //        switch (currentToken.getType()) {
 //            case RESERVED_KEYWORD:
 //                switch (currentToken.getValue().toLowerCase()) {
@@ -191,10 +191,10 @@ public class Parser {
 //                    case "print":
 //                        node.addChild(new Node(nodeId++, "print"));
 //                        expect(TokenType.RESERVED_KEYWORD, "print");
-//                        System.out.println(currentToken.getValue());
+//                        //System.out.println(currentToken.getValue());
 //                        node.addChild(parseATOMIC());
-//                        System.out.println("Hello there");
-//                        System.out.println(currentToken.getValue());
+//                        //System.out.println("Hello there");
+//                        //System.out.println(currentToken.getValue());
 //                        break;
 //                    case "input":
 //                        node.addChild(new Node(nodeId++, "input"));
@@ -208,31 +208,31 @@ public class Parser {
 //                        node.addChild(new Node(nodeId++, "return"));
 //                        expect(TokenType.RESERVED_KEYWORD, "return");
 //                        node.addChild(parseATOMIC());
-//                        System.out.println("RETURN: " + currentToken.getValue());
+//                        //System.out.println("RETURN: " + currentToken.getValue());
 //                        break;
 //                    default:
 //                        throw new RuntimeException("Unexpected token: " + currentToken.getValue());
 //                }
 //                return node;
 //            case VARIABLE:
-//                System.out.println("Hello there man");
+//                //System.out.println("Hello there man");
 //                node.addChild(parseASSIGN());
-//                System.out.println("Hello there after assign of the function " + currentToken.getValue());
+//                //System.out.println("Hello there after assign of the function " + currentToken.getValue());
 //                break;
 //            case FUNCTION:
-//                System.out.println("Function: " + currentToken.getValue());
+//                //System.out.println("Function: " + currentToken.getValue());
 //                node.addChild(parseCALL());
 //                break;
 //            default:
 //                throw new RuntimeException("Unexpected token: " + currentToken.getValue());
 //        }
-//        System.out.println("Parsed command: " + node.getSymbol());
+//        //System.out.println("Parsed command: " + node.getSymbol());
 //        return node;
 //    }
 
     private Node parseCOMMAND() {
         Node node = new Node(nodeId++, "COMMAND");
-        System.out.println("IN COMMAND: " + currentToken.getValue());
+        //System.out.println("IN COMMAND: " + currentToken.getValue());
         switch (currentToken.getType()) {
             case RESERVED_KEYWORD:
                 switch (currentToken.getValue().toLowerCase()) {
@@ -286,7 +286,7 @@ public class Parser {
 
     private Node parseATOMIC() {
         Node node = new Node(nodeId++, "ATOMIC");
-        System.out.println("ATOMIC: " + currentToken.getValue());
+        //System.out.println("ATOMIC: " + currentToken.getValue());
         if (currentToken.getType() == TokenType.VARIABLE) {
             String varName = currentToken.getValue();
             if (symbolTable.lookup(varName) == null) {
@@ -324,8 +324,8 @@ public class Parser {
             node.addChild(new Node(nodeId++, "< input"));
             expect(TokenType.RESERVED_KEYWORD, "< input");
         } else if (currentToken.getType() == TokenType.RESERVED_KEYWORD && currentToken.getValue().equalsIgnoreCase("=")) {
-            System.out.println("CHEKCING --- THIS IS IN PARSE ASSING ");
-            System.out.println("ASSIGN: " + currentToken.getValue());
+            //System.out.println("CHEKCING --- THIS IS IN PARSE ASSING ");
+            //System.out.println("ASSIGN: " + currentToken.getValue());
             node.addChild(new Node(nodeId++, "="));
             expect(TokenType.RESERVED_KEYWORD, "=");
 
@@ -352,7 +352,7 @@ public class Parser {
             }
 
             node.addChild(parseTERM());
-            System.out.println("AFTER TERM IN ASSIGN: " + currentToken.getValue());
+            //System.out.println("AFTER TERM IN ASSIGN: " + currentToken.getValue());
         }
         return node;
     }
@@ -384,17 +384,17 @@ public class Parser {
         expect(TokenType.RESERVED_KEYWORD, "then");
         node.addChild(new Node(nodeId++, "then"));
         node.addChild(parseALGO());
-        System.out.println("BRANCH ifs END: " + currentToken.getValue());
+        //System.out.println("BRANCH ifs END: " + currentToken.getValue());
         expect(TokenType.RESERVED_KEYWORD, "else");
         node.addChild(new Node(nodeId++, "else"));
         node.addChild(parseALGO());
-        System.out.println("BRANCH ifs END: " + currentToken.getValue());
+        //System.out.println("BRANCH ifs END: " + currentToken.getValue());
         return node;
     }
 
     private Node parseTERM() {
         Node node = new Node(nodeId++, "TERM");
-        System.out.println("TERM: " + currentToken.getValue());
+        //System.out.println("TERM: " + currentToken.getValue());
         switch (currentToken.getType()) {
             case VARIABLE:
             case NUMBER:
@@ -408,10 +408,10 @@ public class Parser {
                 node.addChild(parseATOMIC());
                 break;
             case FUNCTION:
-                System.out.println("TERM: " + currentToken.getValue());
+                //System.out.println("TERM: " + currentToken.getValue());
                 node.addChild(parseCALL());
-                System.out.println("AFTER CALL IN TERM: " + currentToken.getValue());
-                System.out.println("YOLO MANS");
+                //System.out.println("AFTER CALL IN TERM: " + currentToken.getValue());
+                //System.out.println("YOLO MANS");
                 break;
             case RESERVED_KEYWORD:
                 switch (currentToken.getValue()) {
@@ -454,10 +454,10 @@ public class Parser {
 //            boolean simple = false;
 //            int param_count = 0;
 //            while (tokenIterator.hasNext()) {
-//                System.out.println("yessss:: "+ tokenIterator.next().getValue());
+//                //System.out.println("yessss:: "+ tokenIterator.next().getValue());
 //                Token token = tokenIterator.next();
 //                if (token.getType() == TokenType.RESERVED_KEYWORD && token.getValue().equals("(")) {
-//                    System.out.println("TOKEN: " + token.getValue());
+//                    //System.out.println("TOKEN: " + token.getValue());
 //                    if(param_count<1) {
 //                        param_count++;
 //                        continue;
@@ -466,17 +466,17 @@ public class Parser {
 //                    break;
 //                }else if(token.getType() == TokenType.RESERVED_KEYWORD && token.getValue().equals(","))
 //                {
-//                    System.out.println("in the commmma");
+//                    //System.out.println("in the commmma");
 //                    break;
 //                }
 //            }
-//            System.out.println("SIMPLE: " + simple);
+//            //System.out.println("SIMPLE: " + simple);
 //
-//            System.out.println("COND CCCURRTENT TOKEN: " + currentToken.getValue());
+//            //System.out.println("COND CCCURRTENT TOKEN: " + currentToken.getValue());
 //            if ((!simple) && currentToken.getType() == TokenType.RESERVED_KEYWORD && (currentToken.getType() == TokenType.RESERVED_KEYWORD && (currentToken.getValue().equalsIgnoreCase("or") || currentToken.getValue().equalsIgnoreCase("and") || currentToken.getValue().equalsIgnoreCase("eq") || currentToken.getValue().equalsIgnoreCase("grt") || currentToken.getValue().equalsIgnoreCase("add") || currentToken.getValue().equalsIgnoreCase("sub") || currentToken.getValue().equalsIgnoreCase("mul") || currentToken.getValue().equalsIgnoreCase("div")))) {
 //                node.addChild(parseSIMPLE());
 //            } else if (simple && (currentToken.getValue().equalsIgnoreCase("not") || currentToken.getValue().equalsIgnoreCase("sqrt")) || (currentToken.getType() == TokenType.RESERVED_KEYWORD && (currentToken.getValue().equalsIgnoreCase("or") || currentToken.getValue().equalsIgnoreCase("and") || currentToken.getValue().equalsIgnoreCase("eq") || currentToken.getValue().equalsIgnoreCase("grt") || currentToken.getValue().equalsIgnoreCase("add") || currentToken.getValue().equalsIgnoreCase("sub") || currentToken.getValue().equalsIgnoreCase("mul") || currentToken.getValue().equalsIgnoreCase("div")))) {
-//                System.out.println("In the composite condition");
+//                //System.out.println("In the composite condition");
 //                node.addChild(parseCOMPOSIT());
 //            } else {
 //                throw new RuntimeException("Unexpected token: " + currentToken);
@@ -491,7 +491,7 @@ public class Parser {
             if (isCOMPOSIT()) {
                 node.addChild(parseCOMPOSIT());
             } else if (isSIMPLE()) {
-                System.out.println("helllo");
+                //System.out.println("helllo");
                 node.addChild(parseSIMPLE());
             } else {
                 throw new RuntimeException("Unexpected token: " + currentToken);
@@ -515,7 +515,7 @@ public class Parser {
             } else if (token.getType() == TokenType.RESERVED_KEYWORD && token.getValue().equals(",")) {
                 return openBrackets != 1; // Only one level of nesting
             }
-            System.out.println("TOKEN: " + openBrackets);
+            //System.out.println("TOKEN: " + openBrackets);
         }
         return false;
     }
@@ -579,12 +579,12 @@ public class Parser {
             default:
                 throw new RuntimeException("Unexpected token: " + currentToken.getValue());
         }
-        System.out.println("BINOP: " + currentToken.getValue());
+        //System.out.println("BINOP: " + currentToken.getValue());
         return node;
     }
 
     private Node parseFNAME() {
-        System.out.println("FNAME: " + currentToken.getValue());
+        //System.out.println("FNAME: " + currentToken.getValue());
         Node node = new Node(nodeId++, "FNAME");
         node.addChild(new Node(nodeId++, currentToken.getValue()));
         expect(TokenType.FUNCTION);
@@ -597,7 +597,7 @@ public class Parser {
             return node; // Nullable
         }
         node.addChild(parseDECL());
-//        System.out.println("FUNCTIONS: " + currentToken.getValue());
+//        //System.out.println("FUNCTIONS: " + currentToken.getValue());
         node.addChild(parseFUNCTIONS());
         return node;
     }
@@ -605,7 +605,7 @@ public class Parser {
     private Node parseDECL() {
         symbolTable.enterScope();
         duplicateSymbolTable.enterScope();
-        System.out.println("DECL: " + currentToken.getValue());
+        //System.out.println("DECL: " + currentToken.getValue());
         Node node = new Node(nodeId++, "DECL");
         node.addChild(parseHEADER());
         node.addChild(parseBODY());
@@ -615,7 +615,7 @@ public class Parser {
     }
 
     private Node parseHEADER() {
-        System.out.println("HEADER: " + currentToken.getValue());
+        //System.out.println("HEADER: " + currentToken.getValue());
         Node node = new Node(nodeId++, "HEADER");
         node.addChild(parseFTYP());
         if (currentToken.getType() == TokenType.FUNCTION) {
@@ -649,8 +649,8 @@ public class Parser {
     }
 
     private Node parseLOCVARS() {
-        System.out.println("HEY THERE IN LOCAL VARS");
-        System.out.println("Current token: " + currentToken.getValue());
+        //System.out.println("HEY THERE IN LOCAL VARS");
+        //System.out.println("Current token: " + currentToken.getValue());
         Node node = new Node(nodeId++, "LOCVARS");
         if (currentToken != null && (currentToken.getType() == TokenType.RESERVED_KEYWORD && currentToken.getValue().equals("num") || (currentToken.getType() == TokenType.RESERVED_KEYWORD && currentToken.getValue().equals("text")))) {
             node.addChild(parseVTYP());
@@ -659,10 +659,10 @@ public class Parser {
                 symbolTable.bind(varName, new SymbolInfo("variableType", symbolTable.getScopeLevel(), nodeId + 1));
                 Node prev = node.getLastChild().getLastChild();
                 if (prev.getSymbol().equals("num")) {
-                    System.out.println("Previous: " + prev.getSymbol());
+                    //System.out.println("Previous: " + prev.getSymbol());
                     duplicateSymbolTable.bind(Integer.toString(nodeId + 1), new SymbolInfo("variableType", duplicateSymbolTable.getScopeLevel(), varName, nodeId + 1,"n"));
                 } else {
-                    System.out.println("Previous: " + prev.getSymbol());
+                    //System.out.println("Previous: " + prev.getSymbol());
                     duplicateSymbolTable.bind(Integer.toString(nodeId + 1), new SymbolInfo("variableType", duplicateSymbolTable.getScopeLevel(), varName, nodeId + 1,"t"));
                 }
             }
@@ -693,11 +693,11 @@ public class Parser {
         expect(TokenType.RESERVED_KEYWORD, "{");
         node.addChild(new Node(nodeId++, "{"));
         node.addChild(parseLOCVARS());
-        System.out.println("BODY: " + currentToken.getValue());
+        //System.out.println("BODY: " + currentToken.getValue());
         node.addChild(parseALGO());
         expect(TokenType.RESERVED_KEYWORD, "}");
         node.addChild(new Node(nodeId++, "}"));
-        System.out.println("BODY: " + currentToken.getValue());
+        //System.out.println("BODY: " + currentToken.getValue());
         node.addChild(parseSUBFUNCS());
         expect(TokenType.RESERVED_KEYWORD, "end");
         node.addChild(new Node(nodeId++, "end"));
@@ -859,7 +859,7 @@ public class Parser {
 
     public void displayTokens() {
         for (Token token : tokens) {
-            System.out.println("Type: " + token.getType() + ", Value: " + token.getValue());
+            //System.out.println("Type: " + token.getType() + ", Value: " + token.getValue());
         }
     }
 

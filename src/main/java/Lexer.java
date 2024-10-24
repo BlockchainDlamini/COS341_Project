@@ -24,7 +24,7 @@ public class Lexer {
                     if (type != TokenType.IGNOREDCHARS) { // Skip whitespace tokens and newlines
                         Token token = new Token(type, matcher.group());
                         tokens.add(token);
-                        System.out.println(token.getValue());
+//                        System.out.println(token.getValue());
                     }
                     position = matcher.end();
                     matched = true;
