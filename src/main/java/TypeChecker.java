@@ -180,6 +180,8 @@ public class TypeChecker {
 
     private boolean typecheckUNOP(Node node) {
         Node child = node.children.get(0);
+        System.out.println(child.getSymbol());
+        System.out.println(typeof(child));
         return (child.symbol.equals("not") && "b".equals(typeof(child))) ||
                 (child.symbol.equals("sqrt") && "n".equals(typeof(child)));
     }
@@ -257,6 +259,7 @@ public class TypeChecker {
                     && "b".equals(typeof(firstChild)) && "b".equals(typeof(simple1)) && "b".equals(typeof(simple2));
         } else if (firstChild.symbol.equals("UNOP")) {
             Node simple = node.children.get(1);
+            System.out.println(simple.getSymbol());
             return typecheck(firstChild) && typecheck(simple) && "b".equals(typeof(firstChild)) && "b".equals(typeof(simple));
         }
         return false;
@@ -420,6 +423,10 @@ public class TypeChecker {
                 return "b";
             case "COND":
                 return typeofCOND(node);
+            case "not":
+                return "b";
+            case "sqrt":
+                return "n";
             default:
                 return "u";
         }
