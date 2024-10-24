@@ -1,4 +1,9 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.*;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 
 public class Translator {
     private SymbolTab symbolTable;  // Manages the variable renaming across scopes
@@ -17,10 +22,23 @@ public class Translator {
         return "L" + labelCounter;
     }
 
-    // Entry method to process the entire input program
-    public String translate(String inputProgram) {
+    // Entry method to process the entire input program from a file
+    public String translate(String filename) {
+        StringBuilder inputProgram = new StringBuilder();
+
+        // Read the file content into a string
+        try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                inputProgram.append(line).append("\n");
+            }
+        } catch (IOException e) {
+            System.err.println("Error reading file: " + e.getMessage());
+            return "";
+        }
+
         // Split the program into lines
-        String[] lines = inputProgram.trim().split("\n");
+        String[] lines = inputProgram.toString().trim().split("\n");
 
         // Process the main program and functions
         processMain(lines);
@@ -152,8 +170,6 @@ public class Translator {
     }
 
     // Processes conditions (for if and loops)
-// Processes conditions (for if and loops)
-    // Processes conditions (for if and loops)
     private void processCondition(String condition, String labelTrue, String labelFalse) {
         condition = condition.trim();
 
@@ -200,25 +216,88 @@ public class Translator {
         }
     }
 
-
-
     // Translates operators from source language to target language
     private String translateOp(String op) {
-        switch (op) {
-            case "grt":
-                return ">";
-            case "eq":
-                return "=";
-            case "add":
-                return "+";
-            case "sub":
-                return "-";
-            case "mul":
-                return "*";
-            case "div":
-                return "/";
-            default:
-                return op; // Default to the operator itself if not found
+        // Check if the operator is in function-like syntax
+        if (op.matches("\\w+\\(.*\\)")) {
+            String functionName = op.substring(0, op.indexOf('(')); // Extract the function name
+            String params = op.substring(op.indexOf('(') + 1, op.lastIndexOf(')')); // Extract parameters
+            String[] arguments = params.split(","); // Split parameters by comma
+
+            // Handle based on the function name
+            switch (functionName) {
+                case "grt":
+                    // Expecting 2 parameters
+                    if (arguments.length == 2) {
+                        return symbolTable.getOrCreate(arguments[0].trim()) + " > " + symbolTable.getOrCreate(arguments[1].trim());
+                    }
+                    break;
+                case "eq":
+                    // Expecting 2 parameters
+                    if (arguments.length == 2) {
+                        return symbolTable.getOrCreate(arguments[0].trim()) + " = " + symbolTable.getOrCreate(arguments[1].trim());
+                    }
+                    break;
+                case "add":
+                    // Expecting 2 parameters
+                    if (arguments.length == 2) {
+                        return symbolTable.getOrCreate(arguments[0].trim()) + " + " + symbolTable.getOrCreate(arguments[1].trim());
+                    }
+                    break;
+                case "sub":
+                    // Expecting 2 parameters
+                    if (arguments.length == 2) {
+                        return symbolTable.getOrCreate(arguments[0].trim()) + " - " + symbolTable.getOrCreate(arguments[1].trim());
+                    }
+                    break;
+                case "mul":
+                    // Expecting 2 parameters
+                    if (arguments.length == 2) {
+                        return symbolTable.getOrCreate(arguments[0].trim()) + " * " + symbolTable.getOrCreate(arguments[1].trim());
+                    }
+                    break;
+                case "div":
+                    // Expecting 2 parameters
+                    if (arguments.length == 2) {
+                        return symbolTable.getOrCreate(arguments[0].trim()) + " / " + symbolTable.getOrCreate(arguments[1].trim());
+                    }
+                    break;
+                // Add more operators here if needed
+                default:
+                    return op; // If the operator is unknown, return as is
+            }
+        } else {
+            // Handle simple operators without parentheses
+            switch (op) {
+                case "grt":
+                    return ">";
+                case "eq":
+                    return "=";
+                case "add":
+                    return "+";
+                case "sub":
+                    return "-";
+                case "mul":
+                    return "*";
+                case "div":
+                    return "/";
+                default:
+                    return op; // Default to the operator itself if not found
+            }
+        }
+
+        // If we reach here, it means the operator is not valid or the number of arguments was wrong
+        throw new IllegalArgumentException("Invalid operator format or number of arguments: " + op);
+    }
+
+    public void writeTranslatedCodeToFile(String filename) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
+            for (String line : code) {
+                writer.write(line);
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            System.err.println("Error writing to file: " + e.getMessage());
         }
     }
 
@@ -261,50 +340,11 @@ public class Translator {
     }
 
     public static void main(String[] args) {
-        String inputProgram = """
-        main
-        num V_a, num V_b, num V_c, num V_result1, num V_result2,
-        begin
-            V_a = 10;
-            V_b = 5;
-            V_c = 3;
-            V_result1 = add(V_a, V_b);
-            V_result2 = F_mainfunc(V_result1, V_b, V_c);
-        end
-
-        num F_mainfunc(V_x, V_y, V_z)
-        {
-            num V_local1, num V_local2, num V_localresult,
-            begin
-                print V_a;
-                V_local1 = sub(V_x, V_y);
-                V_local2 = mul(V_y, V_z);
-                V_localresult = F_localfunc(V_local1, V_local2, V_z);
-                return V_localresult;
-            end
-        }
-        num F_localfunc(V_a, V_b, V_c)
-        {
-            num V_innerresult, num V_hello, num V_world,
-            begin
-                V_innerresult = sub(V_x, V_y);
-                V_innerresult = add(V_a, V_b);
-                if grt(V_innerresult, V_c) then
-                    begin
-                        print "Inner";
-                    end
-                else
-                    begin
-                        print "Equal";
-                    end;
-            return V_innerresult;
-            end
-        }
-        end
-        """;
-
         Translator translator = new Translator();
-        String translatedCode = translator.translate(inputProgram);
+        String translatedCode = translator.translate("src/main/input8.txt");
         System.out.println(translatedCode);
+
+        // Write the translated code to a file
+        translator.writeTranslatedCodeToFile("translated_code.txt");
     }
 }
