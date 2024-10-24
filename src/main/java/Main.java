@@ -54,7 +54,9 @@ public class Main {
             TypeChecker typeChecker = new TypeChecker(symbolTableMap);
             if(!typeChecker.typecheck(parseTree))
                 throw new Exception("Type checking error");
-
+            Translator translator = new Translator();
+            String translatedCode = translator.translate(file.getAbsolutePath());
+            translator.writeTranslatedCodeToFile("translated_code.txt");
         } catch (Exception e) {
             System.err.println(e.getMessage());
         }

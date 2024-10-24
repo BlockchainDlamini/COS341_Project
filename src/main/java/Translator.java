@@ -338,13 +338,4 @@ public class Translator {
             return scopes.get(fullName).peek();
         }
     }
-
-    public static void main(String[] args) {
-        Translator translator = new Translator();
-        String translatedCode = translator.translate("src/main/input8.txt");
-        System.out.println(translatedCode);
-
-        // Write the translated code to a file
-        translator.writeTranslatedCodeToFile("translated_code.txt");
-    }
 }
