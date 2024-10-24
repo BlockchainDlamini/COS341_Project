@@ -80,8 +80,28 @@ public class Translator {
 
     // Processes a function by translating its content
     private void processFunction(List<String> functionLines) {
-        String functionName = functionLines.get(0).split(" ")[1]; // Extract function name
-        String translatedCode = functionName;
+        // Extract the entire function name
+        String functionLine = functionLines.get(0).trim();
+        String functionName = functionLine.substring(functionLine.indexOf(" ") + 1, functionLine.indexOf("(")).trim();
+
+        // Extract the parameters
+        String params = functionLine.substring(functionLine.indexOf("(") + 1, functionLine.indexOf(")")).trim();
+        String[] paramList = params.split(",");
+
+        // Replace parameters with their corresponding values from the symbol table
+        StringBuilder translatedParams = new StringBuilder();
+        for (String param : paramList) {
+            String translatedParam = symbolTable.getOrCreate(param.trim());
+            translatedParams.append(translatedParam).append(", ");
+        }
+
+        // Remove the trailing comma and space
+        if (translatedParams.length() > 0) {
+            translatedParams.setLength(translatedParams.length() - 2);
+        }
+
+        // Combine the function name and translated parameters
+        String translatedCode = functionName + "(" + translatedParams.toString() + ")";
         code.add(translatedCode);
 
         // Enter a new scope for the function
@@ -119,7 +139,7 @@ public class Translator {
 
         String translatedVar = symbolTable.getOrCreate(varName); // Get or create a new identifier for the variable
 
-        if (expr.contains("(")) {
+        if (expr.contains("F_")) {
             processFunctionCall(translatedVar, expr);
         } else {
             code.add(translatedVar + " := " + expr);
@@ -329,6 +349,17 @@ public class Translator {
 
             // Return the current variable identifier
             return scopes.get(fullName).peek();
+        }
+    }
+
+    public static void main(String[] args) {
+        try {
+            Translator translator = new Translator();
+            String translatedCode = translator.translate("src/main/input8.txt");
+            System.out.println(translatedCode);
+            translator.writeTranslatedCodeToFile("translated_code.txt");
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
         }
     }
 }
