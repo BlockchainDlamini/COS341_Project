@@ -198,25 +198,38 @@ public class TypeChecker {
     }
 
     private boolean typecheckBRANCH(Node node) {
-        Node condNode = node.children.get(0);
-        Node algo1 = node.children.get(1);
-        Node algo2 = node.children.get(2);
+        Node condNode = node.children.get(1);
+        System.out.println(condNode.getSymbol());
+        Node algo1 = node.children.get(3);
+        System.out.println(algo1.getSymbol());
+        Node algo2 = node.children.get(5);
+        System.out.println(algo2.getSymbol());
+        boolean typeCheck = typecheck(condNode) && typecheck(algo1) && typecheck(algo2);
+        System.out.println(typeCheck);
+        System.out.println(typeof(condNode) + " --- " +typeof(algo1) + " --- " +typeof(algo2));
         return typecheck(condNode) && "b".equals(typeof(condNode)) && typecheck(algo1) && typecheck(algo2);
     }
 
     private boolean typecheckCOND(Node node) {
         if (node.children.get(0).symbol.equals("SIMPLE")) {
+            System.out.println(node.children.get(0).getSymbol());
             return typecheck(node.children.get(0)) && "b".equals(typeof(node.children.get(0)));
         } else {
             return typecheck(node.children.get(0)) && "b".equals(typeof(node.children.get(0)));
         }
     }
 
+
     private boolean typecheckSIMPLE(Node node) {
         Node binop = node.children.get(0);
+        System.out.println(binop.getSymbol());
         Node atomic1 = node.children.get(1);
+        System.out.println(atomic1.getSymbol());
         Node atomic2 = node.children.get(2);
+        System.out.println(atomic2.getSymbol());
         boolean typeCheck = typecheck(binop) && typecheck(atomic1) && typecheck(atomic2);
+        System.out.println(typeCheck);
+        System.out.println(typeof(binop) + " --- " +typeof(atomic1) + " --- " +typeof(atomic2));
         if ("b".equals(typeof(binop)) && "b".equals(typeof(atomic1)) && "b".equals(typeof(atomic2))) {
             return typeCheck;
         } else if ("c".equals(typeof(binop)) && "n".equals(typeof(atomic1)) && "n".equals(typeof(atomic2))) {
@@ -225,8 +238,17 @@ public class TypeChecker {
         return false;
     }
 
+    private String typeofCOND(Node node) {
+        if (node.children.get(0).symbol.equals("SIMPLE")) {
+            return typeof(node.children.get(0));
+        } else if (node.children.get(0).symbol.equals("COMPOSIT")) {
+            return typeof(node.children.get(0));
+        }
+        return "u"; // Undefined, which will cause the type-checker to return false
+    }
 
-        private boolean typecheckCOMPOSIT(Node node) {
+
+    private boolean typecheckCOMPOSIT(Node node) {
         Node firstChild = node.children.get(0);
         if (firstChild.symbol.equals("BINOP")) {
             Node simple1 = node.children.get(1);
@@ -396,6 +418,8 @@ public class TypeChecker {
             case "SIMPLE":
             case "COMPOSIT":
                 return "b";
+            case "COND":
+                return typeofCOND(node);
             default:
                 return "u";
         }
