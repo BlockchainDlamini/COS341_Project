@@ -351,15 +351,4 @@ public class Translator {
             return scopes.get(fullName).peek();
         }
     }
-
-    public static void main(String[] args) {
-        try {
-            Translator translator = new Translator();
-            String translatedCode = translator.translate("src/main/input8.txt");
-            System.out.println(translatedCode);
-            translator.writeTranslatedCodeToFile("translated_code.txt");
-        } catch (Exception e) {
-            System.err.println(e.getMessage());
-        }
-    }
 }
