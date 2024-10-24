@@ -78,7 +78,7 @@ class FunctionSymbolTable {
     }
     public void viewFunctionSymbolTable(Map<String, SymbolInfo> symbolTableMap) {
         for (Map.Entry<String, SymbolInfo> entry : symbolTableMap.entrySet()) {
-            System.out.println(entry.getKey() + " -> " + entry.getValue());
+//            System.out.println(entry.getKey() + " -> " + entry.getValue());
         }
     }
 }
