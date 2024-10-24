@@ -244,7 +244,11 @@ public class TypeChecker {
         if (node.children.isEmpty()) {
             return true;
         } else {
-            return typecheck(node.children.get(0)) && typecheck(node.children.get(1));
+            System.out.println(node.children.get(0).getSymbol());
+            if(node.children.size() > 1)
+                return typecheck(node.children.get(0)) && typecheck(node.children.get(1));
+            else
+                return typecheck(node.children.get(0));
         }
     }
 
