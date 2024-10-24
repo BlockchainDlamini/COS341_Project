@@ -8,6 +8,7 @@ public class TypeChecker {
         symbolTable = symbl;
     }
     // Symbol table to store variable and function types
+
     private final Map<String, SymbolInfo> symbolTable ; // Make sure symbolTable is initialized
 
     public boolean typecheck(Node node) {
@@ -124,8 +125,10 @@ public class TypeChecker {
     }
 
     private boolean typecheckATOMIC(Node node) {
+        System.out.println(node.getSymbol());
+        System.out.println(node.children.getFirst().getChildren().getFirst().getSymbol());
         if (node.children.get(0).symbol.matches("VNAME")) {
-            return symbolTable.containsKey(node.children.get(0).symbol);
+            return "n".equals(typeof(node.children.get(0))) || "t".equals(typeof(node.children.get(0)));
         } else {
             return "n".equals(typeof(node.children.get(0))) || "t".equals(typeof(node.children.get(0)));
         }
@@ -136,7 +139,9 @@ public class TypeChecker {
         Node vname = node.children.get(0);
         Node term = node.children.get(2);
         System.out.println(vname.getSymbol() + " --- " +term.getSymbol());
-        return typecheck(term) && typeof(vname).equals(typeof(term));
+        System.out.println(typeof(vname));
+        System.out.println(typeof(term));
+        return typecheck(term) ;
     }
 
     private boolean typecheckTERM(Node node) {
@@ -144,6 +149,8 @@ public class TypeChecker {
     }
 
     private boolean typecheckCALL(Node node) {
+        System.out.println("In typecheckCALL");
+
         boolean validTypes = typecheck(node.children.get(1)) && "n".equals(typeof(node.children.get(1)))
                 && typecheck(node.children.get(2)) && "n".equals(typeof(node.children.get(2)))
                 && typecheck(node.children.get(3)) && "n".equals(typeof(node.children.get(3)));
@@ -158,13 +165,16 @@ public class TypeChecker {
         } else if (firstChild.symbol.equals("BINOP")) {
             Node arg1 = node.children.get(1);
             Node arg2 = node.children.get(2);
-            return typecheck(firstChild) && typecheck(arg1) && typecheck(arg2)
-                    && typeof(firstChild).equals(typeof(arg1)) && typeof(arg1).equals(typeof(arg2));
+            System.out.println("inside typecheckOP");
+            System.out.println(firstChild.getSymbol() + " --- " +arg1.getSymbol() + " --- " +arg2.getSymbol());
+             return typecheck(firstChild) && typecheck(arg1) && typecheck(arg2)
+                    && ((typeof(firstChild).equals(typeof(arg1)) && typeof(arg1).equals(typeof(arg2))) || ("c".equals(typeof(firstChild)) && typeof(arg1).equals(typeof(arg2))));
         }
         return false;
     }
 
     private boolean typecheckARG(Node node) {
+        System.out.println(node.symbol);
         return typecheck(node.children.get(0));
     }
 
@@ -175,10 +185,12 @@ public class TypeChecker {
     }
 
     private boolean typecheckBINOP(Node node) {
-        Node firstChild = node.children.get(0);
-        if (firstChild.symbol.equals("or") || firstChild.symbol.equals("and")) {
+//        Node firstChild = node.children.get(0);
+        Node firstChild = node;
+        System.out.println(firstChild.children.getFirst().getSymbol());
+        if (firstChild.children.getFirst().getSymbol().equals("or") || firstChild.children.getFirst().getSymbol().equals("and")) {
             return "b".equals(typeof(firstChild));
-        } else if (firstChild.symbol.equals("eq") || firstChild.symbol.equals("grt")) {
+        } else if (firstChild.children.getFirst().getSymbol().equals("eq") || firstChild.children.getFirst().getSymbol().equals("grt")) {
             return "c".equals(typeof(firstChild));
         } else {
             return "n".equals(typeof(firstChild));
@@ -247,17 +259,30 @@ public class TypeChecker {
         Node vname2 = node.children.get(3);
         Node vname3 = node.children.get(4);
 
+        System.out.println(ftyp.getSymbol());
+        System.out.println(fname.getSymbol());
+        System.out.println(vname1.getSymbol());
+        System.out.println(vname2.getSymbol());
+        System.out.println(vname3.getSymbol());
+//        vn.getChildren().getFirst().getSymbol();
         String ftypType = typeof(ftyp);
-        int fnameId = fname.getUnid();
+        String fnameId = fname.getChildren().getFirst().getSymbol();
+        System.out.println(fnameId);
         symbolTable.get(fnameId).updateDataType(ftypType);
         boolean vnameCheck = "n".equals(typeof(vname1)) && "n".equals(typeof(vname2)) && "n".equals(typeof(vname3));
-
-        return typecheck(ftyp) && vnameCheck;
+        System.out.println(vnameCheck);
+        return vnameCheck;
     }
 
     private boolean typecheckBODY(Node node) {
-        return typecheck(node.children.get(0)) && typecheck(node.children.get(1)) && typecheck(node.children.get(2))
-                && typecheck(node.children.get(3)) && typecheck(node.children.get(4));
+        System.out.println("In typecheckBODY");
+        System.out.println(node.children.get(0).getSymbol());
+        System.out.println(node.children.get(1).getSymbol());
+        System.out.println(node.children.get(2).getSymbol());
+        System.out.println(node.children.get(3).getSymbol());
+        System.out.println(node.children.get(4).getSymbol());
+        System.out.println(node.children.get(5).getSymbol());
+        return typecheck(node.children.get(1)) && typecheck(node.children.get(2)) && typecheck(node.children.get(4));
     }
 
     private boolean typecheckPROLOG(Node node) {
@@ -270,21 +295,44 @@ public class TypeChecker {
 
     private boolean typecheckLOCVARS(Node node) {
         Node vt1 = node.children.get(0);
+        System.out.println(vt1.getSymbol());
+        System.out.println(vt1.children.get(0).getSymbol());
+
         Node vn1 = node.children.get(1);
-        Node vt2 = node.children.get(2);
-        Node vn2 = node.children.get(3);
-        Node vt3 = node.children.get(4);
-        Node vn3 = node.children.get(5);
+        System.out.println(vn1.getSymbol());
+        System.out.println(vn1.children.get(0).getSymbol());
+
+        Node vt2 = node.children.get(2).getChildren().get(0);
+        System.out.println(vt2.getSymbol());
+        System.out.println(vt2.children.get(0).getSymbol());
+
+
+        Node vn2 = node.children.get(2).getChildren().get(1);
+        System.out.println(vn2.getSymbol());
+        System.out.println(vn2.children.get(0).getSymbol());
+
+
+        Node vt3 = node.children.get(2).getChildren().get(2).getChildren().get(0);
+        System.out.println(vt3.getSymbol());
+        System.out.println(vt3.children.get(0).getSymbol());
+
+        Node vn3 = node.children.get(2).getChildren().get(2).getChildren().get(1);
+        System.out.println(vn3.getSymbol());
+        System.out.println(vn3.children.get(0).getSymbol());
+
+        if(node.children.get(2).getChildren().get(2).getChildren().get(2).getChildren().size() > 0)
+            return false;
+
 
         String vt1Type = typeof(vt1);
-        int id1 = vn1.getUnid();
-        symbolTable.get(id1).updateDataType(vt1Type);
+        String key1 = vn1.children.get(0).getSymbol();
+        symbolTable.get(key1).updateDataType(vt1Type);
         String vt2Type = typeof(vt2);
-        int id2 = vn2.getUnid();
-        symbolTable.get(id2).updateDataType(vt2Type);
+        String key2 = vn2.children.get(0).getSymbol();
+        symbolTable.get(key2).updateDataType(vt2Type);
         String vt3Type = typeof(vt3);
-        int id3 = vn3.getUnid();
-        symbolTable.get(id3).updateDataType(vt3Type);
+        String key3 = vn3.children.get(0).getSymbol();
+        symbolTable.get(key3).updateDataType(vt3Type);
 
         return true;
     }
@@ -294,19 +342,26 @@ public class TypeChecker {
     }
 
     private String typeof(Node node) {
+        System.out.println(node.symbol);
         switch (node.symbol) {
             case "VTYP":
+                System.out.println(node.children.get(0).symbol);
                 return node.children.get(0).symbol.equals("num") ? "n" : "t";
+            case "FTYP":
+                return node.children.get(0).symbol.equals("num") ? "n" : "v"; // Numeric return type or void
             case "ATOMIC":
+                System.out.println(node.children.get(0).getSymbol());
                 return typeof(node.children.get(0));
             case "CONST":
+                System.out.println(node.children.get(0).symbol);
                 return node.children.get(0).symbol.matches("\\d+(\\.\\d+)?") ? "n" : "t"; // Checking if it is a numeric constant or text
             case "TERM":
             case "ARG":
                 return typeof(node.children.get(0));
             case "CALL":
                 if (typecheckCALL(node)) {
-                    return symbolTable.get(node.children.getFirst().getUnid()).getDataType().equals("n") ? "n" : "u";
+                    System.out.println(node.children.getFirst().getChildren().getFirst().getSymbol());
+                    return symbolTable.get(node.children.getFirst().getChildren().getFirst().getSymbol()).getDataType().equals("n") ? "n" : "u";
                 } else {
                     return "u"; // Undefined
                 }
@@ -329,6 +384,8 @@ public class TypeChecker {
                 }
             case "FNAME":
             case "VNAME":
+                System.out.println(node.getSymbol());
+                System.out.println(node.children.getFirst().getSymbol());
                 System.out.println(symbolTable.get(node.children.getFirst().getSymbol()).getDataType());
 
                 return symbolTable.get(node.children.getFirst().getSymbol()).getDataType();
@@ -342,10 +399,16 @@ public class TypeChecker {
 
     private Node findFunctionTypeNode(Node node) {
         Node parent = node.getParent(); // Assume Node has a reference to its parent
-        while (parent != null && !parent.symbol.equals("HEADER")) {
+        while (parent != null && !parent.symbol.equals("DECL")) {
             parent = parent.getParent();
+            System.out.println(parent.getSymbol());
         }
-        return parent != null ? parent.children.get(0) : null; // The FTYP node is the first child of HEADER
+        Node header = null;
+        if(parent.getSymbol().equals("DECL"))
+             header = parent.getChildren().get(0);
+        System.out.println(header.getSymbol());
+
+        return parent != null ? header.getChildren().getFirst() : null; // The FTYP node is the first child of HEADER
     }
 
 }

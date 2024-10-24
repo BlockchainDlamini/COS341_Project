@@ -34,7 +34,8 @@ public class Main {
             }
 
             TypeChecker typeChecker = new TypeChecker(symbolTableMap);
-            typeChecker.typecheck(parseTree);
+            if(!typeChecker.typecheck(parseTree))
+                throw new Exception("Type checking error");
         } catch (Exception e) {
             System.err.println(e.getMessage());
         }
